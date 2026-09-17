@@ -1,5 +1,8 @@
 from waitress import serve
 
+def print_hello_world():
+    print("Hello World")
+
 def wsgiapp(environ, start_response):
     status = '200 OK'
     headers = [('Content-type', 'text/plain; charset=utf-8')]
