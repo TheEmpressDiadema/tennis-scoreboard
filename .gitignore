@@ -11,3 +11,10 @@ wheels/
 
 #IDE environment
 /.vscode
+
+#some files
+tz.txt
+db_security.toml
+score_template.json
+/migrations/versions
+sql_template.txt
