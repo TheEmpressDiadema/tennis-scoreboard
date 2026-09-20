@@ -1,7 +1,6 @@
+import uuid
+from sqlalchemy import URL
 from waitress import serve
-
-def print_hello_world():
-    print("Hello World")
 
 def wsgiapp(environ, start_response):
     status = '200 OK'
@@ -12,4 +11,5 @@ def wsgiapp(environ, start_response):
     return [b'Hello from pure Python WSGI']
 
 def main() -> None:
-    serve(wsgiapp, listen='*:8080')
+    # serve(wsgiapp, listen='*:8080')
+    pass
