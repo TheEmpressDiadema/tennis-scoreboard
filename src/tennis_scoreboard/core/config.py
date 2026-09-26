@@ -3,10 +3,24 @@ import tomllib
 from typing import Any
 from sqlalchemy import URL
 
+
 class DBConfig:
 
-    _CONFIG_FILE = "db_config.toml"
-    _SECURITY_FILE = "db_security.toml"
+    DB_HOST: str
+    DB_PORT: int
+    DB_NAME: str
+    DB_DRIVER: str
+    DB_PASSWORD: str
+    DB_USER: str
+
+    @classmethod
+    def _write_config(cls, config: dict[str, Any]) -> None:
+        cls.DB_HOST = config['host']
+        cls.DB_PORT = config['port']
+        cls.DB_NAME = config['database']
+        cls.DB_DRIVER = config['driver']
+        cls.DB_PASSWORD = config['password']
+        cls.DB_USER = config['user']
 
     @classmethod
     def _get_db_config(cls, path: str) -> dict[str, Any]:
@@ -14,9 +28,10 @@ class DBConfig:
             return tomllib.load(config_file)['mysql']
 
     @classmethod
-    def get_database_url(cls) -> str:
-        config = cls._get_db_config(cls._CONFIG_FILE)
-        config.update(cls._get_db_config(cls._SECURITY_FILE))
+    def get_database_url(cls, config_file: str, security_file: str) -> str:
+        config = cls._get_db_config(config_file)
+        config.update(cls._get_db_config(security_file))
+        cls._write_config(config)
         return URL.create(
                 drivername=config['driver'],
                 username=config['user'],
