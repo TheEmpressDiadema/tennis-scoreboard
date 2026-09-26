@@ -17,8 +17,10 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-database_url = DBConfig.get_database_url().replace('%', '%%')
-config.set_main_option("sqlalchemy.url", database_url)
+urls = [
+    DBConfig.get_database_url('test_db_config.toml', 'server_security.toml'),
+    DBConfig.get_database_url('db_config.toml', 'server_security.toml')
+]
 
 target_metadata = BaseModel.metadata
 
@@ -50,8 +52,12 @@ def run_migrations_online() -> None:
         with context.begin_transaction():
             context.run_migrations()
 
+for url in urls:
+    
+    database_url = url.replace('%', '%%')
+    config.set_main_option("sqlalchemy.url", database_url)
 
-if context.is_offline_mode():
-    run_migrations_offline()
-else:
-    run_migrations_online()
+    if context.is_offline_mode():
+        run_migrations_offline()
+    else:
+        run_migrations_online()
