@@ -11,13 +11,13 @@ intpk = Annotated[int, mapped_column(primary_key=True)]
 
 class BaseModel(DeclarativeBase):
 
-    repr_cols_num: int
+    repr_count: int
     repr_cols: list[str]
 
     def __repr__(self) -> str:
         cols = []
-        for idx, col in enumerate(self.__table__.columns.keys()):
-            if col in self.repr_cols or idx < self.repr_cols_num:
+        for i, col in enumerate(self.__table__.columns.keys()):
+            if col in self.repr_cols or i < self.repr_count:
                 cols.append(f"{col}={getattr(self, col)}")
         return f"<{self.__class__.__name__} {', '.join(cols)}>"
 
@@ -40,7 +40,7 @@ class Match(BaseModel):
     uid: Mapped[uuid.UUID] = mapped_column('uuid', Uuid, default=uuid.uuid4)
     first_player_id: Mapped[int] = mapped_column(ForeignKey('players.id', ondelete='CASCADE'), nullable=False)
     second_player_id: Mapped[int] = mapped_column(ForeignKey('players.id', ondelete='CASCADE'), nullable=False)
-    winner_id: Mapped[int] = mapped_column(
+    winner_id: Mapped[int | None] = mapped_column(
         ForeignKey('players.id', ondelete='CASCADE'), 
         nullable=True, 
         default=None
