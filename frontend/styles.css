@@ -1,0 +1,19 @@
+body {
+    background-color: rgb(154, 154, 154);
+}
+
+.header-container {
+    background-color: blue;
+}
+
+.footer-container {
+    background-color: rgb(134, 134, 134);
+}
+
+.new-match-button {
+    background-color: rgb(105, 105, 105);
+}
+
+.list-container {
+    background-color: None;
+}
