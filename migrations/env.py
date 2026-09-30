@@ -5,7 +5,7 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from tennis_scoreboard.core.config import DBConfig
+from tennis_scoreboard.core.db_config import DBConfig
 from tennis_scoreboard.models.models import (
     BaseModel,
     Player, #noqa
