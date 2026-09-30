@@ -2,11 +2,11 @@ body {
     background-color: rgb(154, 154, 154);
 }
 
-.header-container {
+header {
     background-color: blue;
 }
 
-.footer-container {
+footer {
     background-color: rgb(134, 134, 134);
 }
 

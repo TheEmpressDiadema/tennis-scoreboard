@@ -1,21 +1,11 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="Text/html"; charset="utf-8">
-        <link rel="stylesheet" href="C:\VSCode projects\roadmap\tennis-scoreboard\frontend\styles.css">
-        <title>Создать новый матч</title>
-    </head>
-    <body>
-        <header>
-            <div class="header-container">
-                <a href="#">Теннисные матчи</a>
-            </div>
-        </header>
+{% extends "base.html" %}
 
-        <footer>
-            <div class="footer-container">
-                In memory of Dmitry
-            </div>
-        </footer>
-    </body>
-</html>
+{% block title %}Создание нового матча{% endblock %}
+
+{% block content %}
+    <form>
+        {{ input('first_player') }}
+        {{ input('second_player') }}
+        <button>Начать матч</button>
+    </form>
+{% endblock %}
