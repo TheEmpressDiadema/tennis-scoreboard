@@ -18,9 +18,6 @@ class PlayerSQLRepository(PlayerRepository):
             player = Player(name=name)
             self._session.add(player)
             self._session.commit()
-
-            
-            return player
         
         except IntegrityError:
 
@@ -31,6 +28,8 @@ class PlayerSQLRepository(PlayerRepository):
 
             self._session.rollback()
             raise
+
+        return player
 
     def get_by_id(self, id: int) -> Player:
         try:
