@@ -4,5 +4,5 @@ class PlayerExistsError(Exception):
 class PlayerNotFoundError(Exception):
     ...
 
-class MatchNotFound(Exception):
+class MatchNotFoundError(Exception):
     ...
