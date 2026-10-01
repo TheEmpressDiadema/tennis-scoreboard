@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 
 from tennis_scoreboard.models.models import Match, Player
-from tennis_scoreboard.errors.db_errors import MatchNotFound
+from tennis_scoreboard.errors.db_errors import MatchNotFoundError
 from tennis_scoreboard.repositories.abstract import MatchRepository
 
 
@@ -31,7 +31,7 @@ class MatchSQLRepository(MatchRepository):
             raise
 
         if match is None:
-            raise MatchNotFound
+            raise MatchNotFoundError
 
         return match
 
@@ -64,6 +64,6 @@ class MatchSQLRepository(MatchRepository):
             raise
 
         if match_object is None:
-            raise MatchNotFound
+            raise MatchNotFoundError
 
         return match_object
