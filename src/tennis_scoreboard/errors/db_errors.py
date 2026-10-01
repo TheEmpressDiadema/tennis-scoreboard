@@ -3,3 +3,6 @@ class PlayerExistsError(Exception):
 
 class PlayerNotFoundError(Exception):
     ...
+
+class MatchNotFound(Exception):
+    ...
