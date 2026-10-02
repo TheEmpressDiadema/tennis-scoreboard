@@ -6,7 +6,7 @@ from tennis_scoreboard.errors.db_errors import PlayerExistsError, PlayerNotFound
 from tennis_scoreboard.repositories.abstract import PlayerRepository
 
 
-class PlayerSQLRepository(PlayerRepository):
+class PlayerSqlRepository(PlayerRepository):
 
     def __init__(self, session: Session) -> None:
         self._session: Session = session

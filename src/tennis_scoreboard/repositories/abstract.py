@@ -1,6 +1,7 @@
-from typing import Protocol
-from typing import Any
+from uuid import UUID
+from typing import Protocol, Any
 
+from tennis_scoreboard.models.value_objects import Score
 from tennis_scoreboard.models.models import Player, Match
 
 class PlayerRepository(Protocol):
@@ -13,8 +14,8 @@ class MatchRepository(Protocol):
 
     def get_all(self) -> list[Match]: ...
 
-    def get_by_id(self, id: int) -> Match: ...
+    def get_by_uuid(self, uuid: UUID) -> Match: ...
 
     def add(self, actor: Player, opponent: Player) -> Match: ...
 
-    def update(self, id: int, score: dict[str, Any]) -> Match: ...
+    def update(self, uuid: UUID, score: Score) -> Match: ...

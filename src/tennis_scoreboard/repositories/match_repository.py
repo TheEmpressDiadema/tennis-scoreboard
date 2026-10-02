@@ -1,15 +1,17 @@
-from uuid import uuid4
+from uuid import uuid4, UUID
 from typing import Any
+
 from sqlalchemy import update
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 
 from tennis_scoreboard.models.models import Match, Player
-from tennis_scoreboard.errors.db_errors import MatchNotFoundError
+from tennis_scoreboard.models.value_objects import SetScore, Score
 from tennis_scoreboard.repositories.abstract import MatchRepository
+from tennis_scoreboard.errors.db_errors import MatchNotFoundError, PlayerNotFoundError
 
 
-class MatchSQLRepository(MatchRepository):
+class MatchSqlRepository(MatchRepository):
 
     def __init__(self, session: Session):
         self._session = session
@@ -23,10 +25,10 @@ class MatchSQLRepository(MatchRepository):
 
         return matches
 
-    def get_by_id(self, id: int) -> Match:
+    def get_by_uuid(self, uuid: UUID) -> Match:
 
         try:
-            match = self._session.get(Match, id)
+            match = self._session.get(Match, uuid)
         except SQLAlchemyError:
             raise
 
@@ -38,23 +40,33 @@ class MatchSQLRepository(MatchRepository):
     def add(self, actor: Player, opponent: Player) -> Match:
 
         try:
-            match_object = Match(uid=uuid4(), first_player=actor, second_player=opponent, score={})
+            score = Score(
+                first_player_name=actor.name,
+                second_player_name=actor.name
+            )
+            match_object = Match(
+                uid=uuid4(), 
+                first_player_id=actor.id, 
+                second_player_id=opponent.id, 
+                score=score.as_dict())
             self._session.add(match_object)
             self._session.commit()
         except SQLAlchemyError:
             self._session.rollback()
-
-            raise 
+            raise
+        except IntegrityError:
+            self._session.rollback()
+            raise PlayerNotFoundError
 
         return match_object
 
-    def update(self, id: int, score: dict[str, Any]) -> Match:
+    def update(self, uuid: UUID, score: Score) -> Match:
 
         try:
             stmt = (
                 update(Match).
-                where(Match.id==id).
-                values(score=score).
+                where(Match.uuid==uuid).
+                values(score=score.as_dict()).
                 returning(Match)
             )
             match_object = self._session.execute(stmt).scalars().first()
