@@ -1,6 +1,6 @@
-import uuid
+from uuid import UUID, uuid4
 
-from sqlalchemy import String, ForeignKey, Uuid, JSON
+from sqlalchemy import String, ForeignKey, Uuid, JSON, CheckConstraint
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 from typing import Annotated, Any
@@ -28,7 +28,7 @@ class Player(BaseModel):
     id: Mapped[intpk]
     name: Mapped[str] = mapped_column(String(30), nullable=False, unique=True)
 
-    repr_cols_num = 2
+    repr_count = 2
     repr_cols = ["id", "name"]
 
 
@@ -37,7 +37,7 @@ class Match(BaseModel):
     __tablename__ = 'matches'
 
     id: Mapped[intpk]
-    uid: Mapped[uuid.UUID] = mapped_column('uuid', Uuid, default=uuid.uuid4)
+    uuid: Mapped[UUID] = mapped_column(Uuid, default=uuid4, unique=True)
     first_player_id: Mapped[int] = mapped_column(ForeignKey('players.id', ondelete='CASCADE'), nullable=False)
     second_player_id: Mapped[int] = mapped_column(ForeignKey('players.id', ondelete='CASCADE'), nullable=False)
     winner_id: Mapped[int | None] = mapped_column(
@@ -45,7 +45,7 @@ class Match(BaseModel):
         nullable=True, 
         default=None
         )
-    score: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    score: Mapped[list[dict[str, Any]]] = mapped_column(JSON, nullable=False)
 
     first_player: Mapped["Player"] = relationship(
         argument='Player',
@@ -60,5 +60,9 @@ class Match(BaseModel):
         foreign_keys=[winner_id]
     )
 
-    repr_cols_num = 6
+    repr_count = 6
     repr_cols = ['id', 'uid', 'first_player_id', 'second_player_id', 'winner_id', 'score']
+
+    __table_args__ = (
+        CheckConstraint("first_player_id != second_player_id", name="check_fk_equal"),
+    )
