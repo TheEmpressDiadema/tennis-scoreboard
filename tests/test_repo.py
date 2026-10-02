@@ -1,14 +1,19 @@
 import pytest
 
-from typing import Any
+from uuid import UUID
 from contextlib import nullcontext
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.exc import IntegrityError
 
 from tennis_scoreboard.core.db_config import DBConfig
-from tennis_scoreboard.repositories.match_repository import MatchSQLRepository
-from tennis_scoreboard.repositories.player_repository import PlayerSQLRepository
-from tennis_scoreboard.errors.db_errors import PlayerExistsError, PlayerNotFoundError
+from tennis_scoreboard.repositories.match_repository import MatchSqlRepository
+from tennis_scoreboard.repositories.player_repository import PlayerSqlRepository
+from tennis_scoreboard.errors.db_errors import (
+    PlayerExistsError, 
+    PlayerNotFoundError,
+    MatchNotFoundError
+)
 from tennis_scoreboard.models.models import (
     BaseModel,
     Player, #noqa
@@ -46,7 +51,7 @@ class TestPlayerSQLRepository:
         ]
     )
     def test_add(self, name: str, expected: Player, raises: nullcontext) -> None:
-        repo = PlayerSQLRepository(create_session())
+        repo = PlayerSqlRepository(create_session())
 
         with raises:
             player = repo.add(name)
@@ -65,61 +70,9 @@ class TestPlayerSQLRepository:
         ]
     )
     def test_get(self, id: int, expected: Player, raises: nullcontext) -> None:
-        repo = PlayerSQLRepository(create_session())
+        repo = PlayerSqlRepository(create_session())
 
         with raises:
             player = repo.get_by_id(id)
             assert player.id == expected.id
             assert player.name == expected.name
-
-@pytest.mark.usefixtures("setup_database")
-class TestMatchSQLRepository:
-
-    @pytest.mark.parametrize(
-        "actor, opponent, raises",
-        [
-            (),
-        ]
-    )
-    def test_add(self, actor: Player, opponent: Player, expected: Match, raises: nullcontext) -> None:
-        repo = MatchSQLRepository(create_session())
-
-        with raises:
-            assert 1 == 1
-
-    @pytest.mark.parametrize(
-            "id, raises",
-            [
-                (),
-            ]
-    )
-    def test_get_by_id(self, id: int, expected: Match, raises: nullcontext) -> None:
-        repo = MatchSQLRepository(create_session())
-
-        with raises:
-            assert 1 == 1
-
-    @pytest.mark.parametrize(
-            "id, score, expected, raises",
-            [
-                (),
-            ]
-    )
-    def test_update(self, id: int, score: dict[str, Any], expected: Match, raises: nullcontext) -> None:
-        repo = MatchSQLRepository(create_session())
-
-        with raises:
-            assert 1 == 1
-
-    @pytest.mark.parametrize(
-        "raises",
-        [
-            (),
-        ]
-    )
-    def test_get_all(self, expected: list[Match], raises: nullcontext) -> None:
-        repo = MatchSQLRepository(create_session())
-
-        with raises:
-            assert 1 == 1
-
