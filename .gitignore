@@ -11,6 +11,8 @@ wheels/
 
 #IDE environment
 /.vscode
+.mypy_cache
+.pytest_cache
 
 #some files
 tz.txt
