@@ -1,79 +1,83 @@
 from uuid import uuid4, UUID
 from typing import Any
 
-from sqlalchemy import update
-from sqlalchemy.orm import Session
+from sqlalchemy import update, select
+from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 
 from tennis_scoreboard.models.models import Match, Player
-from tennis_scoreboard.models.value_objects import SetScore, Score
+from tennis_scoreboard.schemas.value_objects import SetScore, Score
 from tennis_scoreboard.repositories.abstract import MatchRepository
 from tennis_scoreboard.errors.db_errors import MatchNotFoundError, PlayerNotFoundError
 
 
 class MatchSqlRepository(MatchRepository):
 
-    def __init__(self, session: Session):
-        self._session = session
+    def __init__(self, session_factory: sessionmaker[Session]):
+        self._session_factory = session_factory
 
     def get_all(self) -> list[Match]:
-
-        try:
-            matches = self._session.query(Match).all()
-        except SQLAlchemyError:
-            raise
+        with self._session_factory() as session:
+            try:
+                matches = session.query(Match).all()
+            except SQLAlchemyError:
+                raise
 
         return matches
 
     def get_by_uuid(self, uuid: UUID) -> Match:
+        with self._session_factory() as session:
+            try:
+                stmt = (
+                    select(Match).
+                    where(Match.uuid==uuid)
+                )
+                match = session.execute(stmt).scalars().one_or_none()
+            except SQLAlchemyError:
+                raise
 
-        try:
-            match = self._session.get(Match, uuid)
-        except SQLAlchemyError:
-            raise
-
-        if match is None:
-            raise MatchNotFoundError
+            if match is None:
+                raise MatchNotFoundError
 
         return match
 
     def add(self, actor: Player, opponent: Player) -> Match:
-
-        try:
-            score = Score(
-                first_player_name=actor.name,
-                second_player_name=actor.name
-            )
-            match_object = Match(
-                uid=uuid4(), 
-                first_player_id=actor.id, 
-                second_player_id=opponent.id, 
-                score=score.as_dict())
-            self._session.add(match_object)
-            self._session.commit()
-        except SQLAlchemyError:
-            self._session.rollback()
-            raise
-        except IntegrityError:
-            self._session.rollback()
-            raise PlayerNotFoundError
+        with self._session_factory() as session:
+            try:
+                score = Score(
+                    actor.name,
+                    opponent.name
+                )
+                match_object = Match(
+                    uuid=uuid4(), 
+                    first_player_id=actor.id, 
+                    second_player_id=opponent.id, 
+                    score=score)
+                session.add(match_object)
+                session.commit()
+            except IntegrityError:
+                session.rollback()
+                raise PlayerNotFoundError
+            except SQLAlchemyError:
+                    session.rollback()
+                    raise
 
         return match_object
 
     def update(self, uuid: UUID, score: Score) -> Match:
-
-        try:
-            stmt = (
-                update(Match).
-                where(Match.uuid==uuid).
-                values(score=score.as_dict()).
-                returning(Match)
-            )
-            match_object = self._session.execute(stmt).scalars().first()
-            self._session.commit()
-        except SQLAlchemyError:
-            self._session.rollback()
-            raise
+        with self._session_factory() as session:
+            try:
+                stmt = (
+                    update(Match).
+                    where(Match.uuid==uuid).
+                    values(score=score).
+                    returning(Match)
+                )
+                match_object = session.execute(stmt).scalars().first()
+                session.commit()
+            except SQLAlchemyError:
+                session.rollback()
+                raise
 
         if match_object is None:
             raise MatchNotFoundError
