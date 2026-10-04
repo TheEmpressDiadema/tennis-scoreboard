@@ -1,13 +1,33 @@
 from uuid import UUID, uuid4
-
-from sqlalchemy import String, ForeignKey, Uuid, JSON, CheckConstraint
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
-
+from dataclasses import asdict
 from typing import Annotated, Any
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from sqlalchemy import (
+    String, ForeignKey, Uuid, 
+    JSON, CheckConstraint, TypeDecorator
+)
+from tennis_scoreboard.schemas.value_objects import Score
 
 
 intpk = Annotated[int, mapped_column(primary_key=True)]
 
+
+class ScoreType(TypeDecorator):
+
+    impl = JSON
+    cache_ok = True
+
+    def process_bind_param(self, value, dialect):
+        if value is None:
+            return None
+        if isinstance(value, dict):
+            return value
+        return asdict(value)
+
+    def process_result_value(self, value, dialect):
+        if value is None:
+            return None
+        return Score.from_dict()
 
 class BaseModel(DeclarativeBase):
 
@@ -45,7 +65,7 @@ class Match(BaseModel):
         nullable=True, 
         default=None
         )
-    score: Mapped[list[dict[str, Any]]] = mapped_column(JSON, nullable=False)
+    score: Mapped[Score] = mapped_column(ScoreType, nullable=False)
 
     first_player: Mapped["Player"] = relationship(
         argument='Player',
@@ -61,7 +81,7 @@ class Match(BaseModel):
     )
 
     repr_count = 6
-    repr_cols = ['id', 'uid', 'first_player_id', 'second_player_id', 'winner_id', 'score']
+    repr_cols = ['id', 'uuid', 'first_player_id', 'second_player_id', 'winner_id', 'score']
 
     __table_args__ = (
         CheckConstraint("first_player_id != second_player_id", name="check_fk_equal"),
