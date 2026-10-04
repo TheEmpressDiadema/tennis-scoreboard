@@ -1,7 +1,7 @@
 from uuid import UUID
-from typing import Protocol, Any
+from typing import Protocol
 
-from tennis_scoreboard.models.value_objects import Score
+from tennis_scoreboard.schemas.value_objects import Score
 from tennis_scoreboard.models.models import Player, Match
 
 class PlayerRepository(Protocol):
