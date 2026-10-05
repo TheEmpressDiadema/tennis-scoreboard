@@ -11,6 +11,7 @@ from tennis_scoreboard.models.models import (
 )
 from tests.utils import get_player_repo
 
+
 @pytest.mark.usefixtures("prepare_database")
 class TestPlayerSqlRepository:
 
@@ -19,9 +20,10 @@ class TestPlayerSqlRepository:
     @pytest.mark.parametrize(
         "name, expected, raises",
         [
-            ('Victor', Player(id=1, name='Victor'), nullcontext()),
-            ('Dmitriy', Player(id=2, name='Dmitriy'), nullcontext()),
-            ('Victor', None, pytest.raises(PlayerExistsError))
+            ('Sergey', Player(id=4, name='Sergey'), nullcontext()),
+            ('Nikolay', Player(id=5, name='Nikolay'), nullcontext()),
+            ('Victor', Player(id=1, name='Victor'), pytest.raises(PlayerExistsError)),
+            ('Dmitriy', Player(id=2, name='Dmitriy'), pytest.raises(PlayerExistsError))
         ]
     )
     def test_add(self, name: str, expected: Player, raises: nullcontext) -> None:
@@ -33,7 +35,8 @@ class TestPlayerSqlRepository:
             "id, expected, raises",
             [
                 (1, Player(id=1, name='Victor'), nullcontext()),
-                (3, None, pytest.raises(PlayerNotFoundError))
+                (3, Player(id=3, name='Egor'), nullcontext()),
+                (6, None, pytest.raises(PlayerNotFoundError))
             ]
     )
     def test_get_by_id(self, id: int, expected: Player, raises: nullcontext) -> None:
