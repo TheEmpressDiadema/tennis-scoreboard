@@ -1,9 +1,9 @@
 from uuid import UUID, uuid4
 from dataclasses import asdict
-from typing import Annotated, Any
+from typing import Annotated
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy import (
-    String, ForeignKey, Uuid, 
+    String, ForeignKey, Uuid, Dialect, 
     JSON, CheckConstraint, TypeDecorator
 )
 from tennis_scoreboard.schemas.value_objects import Score
@@ -17,17 +17,15 @@ class ScoreType(TypeDecorator):
     impl = JSON
     cache_ok = True
 
-    def process_bind_param(self, value, dialect):
+    def process_bind_param(self, value: Score | None, dialect: Dialect):
         if value is None:
             return None
-        if isinstance(value, dict):
-            return value
         return asdict(value)
 
-    def process_result_value(self, value, dialect):
+    def process_result_value(self, value: dict | None, dialect: Dialect):
         if value is None:
             return None
-        return Score.from_dict()
+        return Score.from_dict(value)
 
 class BaseModel(DeclarativeBase):
 
