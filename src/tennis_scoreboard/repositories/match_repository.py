@@ -1,12 +1,11 @@
 from uuid import uuid4, UUID
-from typing import Any
 
-from sqlalchemy import update, select
+from sqlalchemy import select
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 
 from tennis_scoreboard.models.models import Match, Player
-from tennis_scoreboard.schemas.value_objects import SetScore, Score
+from tennis_scoreboard.schemas.value_objects import Score
 from tennis_scoreboard.repositories.abstract import MatchRepository
 from tennis_scoreboard.errors.db_errors import MatchNotFoundError, PlayerNotFoundError
 
@@ -66,20 +65,21 @@ class MatchSqlRepository(MatchRepository):
 
     def update(self, uuid: UUID, score: Score) -> Match:
         with self._session_factory() as session:
+            stmt = (
+                select(Match).
+                where(Match.uuid==uuid)
+            )
+            match = session.execute(stmt).scalars().first()
+            
+            if match is None:
+                raise MatchNotFoundError
+
+            match.score = score
+
             try:
-                stmt = (
-                    update(Match).
-                    where(Match.uuid==uuid).
-                    values(score=score).
-                    returning(Match)
-                )
-                match_object = session.execute(stmt).scalars().first()
                 session.commit()
-            except SQLAlchemyError:
+            except IntegrityError:
                 session.rollback()
                 raise
 
-        if match_object is None:
-            raise MatchNotFoundError
-
-        return match_object
+        return match
