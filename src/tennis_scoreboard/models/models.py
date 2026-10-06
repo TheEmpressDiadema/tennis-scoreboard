@@ -6,7 +6,7 @@ from sqlalchemy import (
     String, ForeignKey, Uuid, Dialect, 
     JSON, CheckConstraint, TypeDecorator
 )
-from tennis_scoreboard.schemas.value_objects import Score
+from tennis_scoreboard.schemas.schemas import Score
 
 
 intpk = Annotated[int, mapped_column(primary_key=True)]

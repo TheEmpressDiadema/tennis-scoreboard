@@ -6,7 +6,7 @@ from sqlalchemy.exc import IntegrityError
 
 from tests.utils import get_match_repo
 from tennis_scoreboard.models.models import Player, Match
-from tennis_scoreboard.schemas.value_objects import Score, SetScore
+from tennis_scoreboard.schemas.schemas import Score, SetScore
 from tennis_scoreboard.errors.db_errors import (
     PlayerNotFoundError,
     MatchNotFoundError

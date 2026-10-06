@@ -43,3 +43,16 @@ class TestPlayerSqlRepository:
         with raises:
             player = self._repo.get_by_id(id)
             assert player.name == expected.name
+
+    @pytest.mark.parametrize(
+        "name, expected, raises",
+        [
+            ('Victor', Player(id=1, name='Victor'), nullcontext()),
+            ('Dmitriy', Player(id=2, name='Victor'), nullcontext()),
+            ('Konstantin', None, pytest.raises(PlayerNotFoundError))
+        ]
+    )
+    def test_get_by_name(self, name: str, expected: Player, raises: nullcontext) -> None:
+        with raises:
+            player = self._repo.get_by_name(name)
+            assert player.id == expected.id

@@ -6,7 +6,7 @@ from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy import insert
 
 from tests.utils import get_engine
-from tennis_scoreboard.schemas.value_objects import Score
+from tennis_scoreboard.schemas.schemas import Score
 from tennis_scoreboard.models.models import (
     BaseModel,
     Player,
