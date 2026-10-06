@@ -1,3 +1,4 @@
+from sqlalchemy import select
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
@@ -18,6 +19,8 @@ class PlayerSqlRepository(PlayerRepository):
                 player = Player(name=name)
                 session.add(player)
                 session.commit()
+
+                return player
             except IntegrityError:
                 session.rollback()
                 raise PlayerExistsError
@@ -25,16 +28,30 @@ class PlayerSqlRepository(PlayerRepository):
                 session.rollback()
                 raise
 
-        return player
-
     def get_by_id(self, id: int) -> Player:
         with self._session_factory() as session:
             try:
                 player = session.get(Player, id)
+
+                if player is None:
+                    raise PlayerNotFoundError
+        
+                return player
             except SQLAlchemyError:
                 raise
 
-        if player is None:
-            raise PlayerNotFoundError
+    def get_by_name(self, name: str) -> Player:
+        with self._session_factory() as session:
+            try:
+                stmt = (
+                    select(Player).
+                    where(Player.name==name)
+                )
+                player = session.execute(stmt).scalar_one_or_none()
 
-        return player
+                if player is None:
+                    raise PlayerNotFoundError
+
+                return player
+            except SQLAlchemyError:
+                raise

@@ -1,11 +1,11 @@
 from uuid import uuid4, UUID
 
-from sqlalchemy import select
+from sqlalchemy import select, and_, or_
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 
 from tennis_scoreboard.models.models import Match, Player
-from tennis_scoreboard.schemas.value_objects import Score
+from tennis_scoreboard.schemas.schemas import Score
 from tennis_scoreboard.repositories.abstract import MatchRepository
 from tennis_scoreboard.errors.db_errors import MatchNotFoundError, PlayerNotFoundError
 
@@ -19,10 +19,9 @@ class MatchSqlRepository(MatchRepository):
         with self._session_factory() as session:
             try:
                 matches = session.query(Match).all()
+                return matches
             except SQLAlchemyError:
                 raise
-
-        return matches
 
     def get_by_uuid(self, uuid: UUID) -> Match:
         with self._session_factory() as session:
@@ -32,13 +31,33 @@ class MatchSqlRepository(MatchRepository):
                     where(Match.uuid==uuid)
                 )
                 match = session.execute(stmt).scalars().one_or_none()
+
+                if match is None:
+                    raise MatchNotFoundError
+
+                return match
             except SQLAlchemyError:
                 raise
 
-            if match is None:
-                raise MatchNotFoundError
-
-        return match
+    def get_matches_by_player_id(self, player_id: int) -> list[Match]:
+        with self._session_factory() as session:
+            try:
+                stmt = (
+                    select(Match).
+                    where(
+                        and_(
+                            or_(
+                                Match.first_player_id==player_id, 
+                                Match.second_player_id==player_id
+                            ),
+                            Match.winner_id.is_not(None)
+                        )
+                    )
+                )
+                matches = session.execute(stmt).scalars()
+                return list(matches)
+            except SQLAlchemyError:
+                raise
 
     def add(self, actor: Player, opponent: Player) -> Match:
         with self._session_factory() as session:
@@ -54,14 +73,14 @@ class MatchSqlRepository(MatchRepository):
                     score=score)
                 session.add(match_object)
                 session.commit()
+
+                return match_object
             except IntegrityError:
                 session.rollback()
                 raise PlayerNotFoundError
             except SQLAlchemyError:
                     session.rollback()
                     raise
-
-        return match_object
 
     def update(self, uuid: UUID, score: Score) -> Match:
         with self._session_factory() as session:
@@ -78,8 +97,7 @@ class MatchSqlRepository(MatchRepository):
 
             try:
                 session.commit()
+                return match
             except IntegrityError:
                 session.rollback()
                 raise
-
-        return match
