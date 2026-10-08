@@ -1,7 +1,7 @@
 from uuid import UUID
 from typing import Protocol
 
-from tennis_scoreboard.schemas.schemas import Score
+from tennis_scoreboard.schemas.score import Score
 from tennis_scoreboard.models.models import Player, Match
 
 class PlayerRepository(Protocol):
@@ -18,7 +18,7 @@ class MatchRepository(Protocol):
 
     def get_by_uuid(self, uuid: UUID) -> Match: ...
 
-    def get_matches_by_player_id(self, player_id: int) -> list[Match]: ...
+    def get_ended_player_matches(self, player_id: int) -> list[Match]: ...
 
     def add(self, actor: Player, opponent: Player) -> Match: ...
 
