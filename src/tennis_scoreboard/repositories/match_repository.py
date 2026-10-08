@@ -1,11 +1,11 @@
 from uuid import uuid4, UUID
 
-from sqlalchemy import select, and_, or_
+from sqlalchemy import select, or_
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 
 from tennis_scoreboard.models.models import Match, Player
-from tennis_scoreboard.schemas.schemas import Score
+from tennis_scoreboard.schemas.score import Score
 from tennis_scoreboard.repositories.abstract import MatchRepository
 from tennis_scoreboard.errors.db_errors import MatchNotFoundError, PlayerNotFoundError
 
@@ -30,28 +30,26 @@ class MatchSqlRepository(MatchRepository):
                     select(Match).
                     where(Match.uuid==uuid)
                 )
-                match = session.execute(stmt).scalars().one_or_none()
+                match_obj = session.execute(stmt).scalars().one_or_none()
 
-                if match is None:
+                if match_obj is None:
                     raise MatchNotFoundError
 
-                return match
+                return match_obj
             except SQLAlchemyError:
                 raise
 
-    def get_matches_by_player_id(self, player_id: int) -> list[Match]:
+    def get_ended_player_matches(self, player_id: int) -> list[Match]:
         with self._session_factory() as session:
             try:
                 stmt = (
                     select(Match).
                     where(
-                        and_(
-                            or_(
+                        or_(
                                 Match.first_player_id==player_id, 
                                 Match.second_player_id==player_id
                             ),
-                            Match.winner_id.is_not(None)
-                        )
+                        Match.winner_id.is_not(None)
                     )
                 )
                 matches = session.execute(stmt).scalars()
@@ -62,10 +60,7 @@ class MatchSqlRepository(MatchRepository):
     def add(self, actor: Player, opponent: Player) -> Match:
         with self._session_factory() as session:
             try:
-                score = Score(
-                    actor.name,
-                    opponent.name
-                )
+                score = Score()
                 match_object = Match(
                     uuid=uuid4(), 
                     first_player_id=actor.id, 
@@ -88,16 +83,16 @@ class MatchSqlRepository(MatchRepository):
                 select(Match).
                 where(Match.uuid==uuid)
             )
-            match = session.execute(stmt).scalars().first()
+            match_object = session.execute(stmt).scalars().first()
             
-            if match is None:
+            if match_object is None:
                 raise MatchNotFoundError
 
-            match.score = score
+            match_object.score = score
 
             try:
                 session.commit()
-                return match
+                return match_object
             except IntegrityError:
                 session.rollback()
                 raise
