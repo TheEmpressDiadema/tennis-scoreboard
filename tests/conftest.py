@@ -6,7 +6,7 @@ from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy import insert
 
 from tests.utils import get_engine
-from tennis_scoreboard.schemas.schemas import Score
+from tennis_scoreboard.schemas.score import Score, PlayerScore
 from tennis_scoreboard.models.models import (
     BaseModel,
     Player,
@@ -33,26 +33,31 @@ def _fill_matches(session_factory: sessionmaker[Session]) -> None:
             uuid=UUID(hex='00000000-0000-0000-0000-000000000001'),
             first_player_id=1,
             second_player_id=2,
-            score=Score('Victor', 'Dmitriy')
+            score=Score()
             ),
         Match(
             uuid=UUID(hex='00000000-0000-0000-0000-000000000002'),
             first_player_id=2,
             second_player_id=3,
-            score=Score('Dmitriy', 'Egor')
+            score=Score()
+        ),
+        Match (
+            uuid=UUID(hex='00000000-0000-0000-0000-000000000003'),
+            first_player_id=1,
+            second_player_id=2,
+            winner_id=2,
+            score=Score(
+                first_player_score=PlayerScore(
+                    games=2
+                ),
+                second_player_score=PlayerScore(
+                    games=1
+                )
+            )
         )
     ]
     with session_factory() as session:
-        for match in matches:
-            stmt = insert(Match).values(
-                {
-                    'uuid' : match.uuid,
-                    'first_player_id' : match.first_player_id,
-                    'second_player_id' : match.second_player_id,
-                    'score' : match.score
-                }
-            )
-            session.execute(stmt)
+        session.add_all(matches)
         session.commit()
 
 def _fill_table(engine: Engine, model: type[BaseModel]) -> None:
@@ -63,7 +68,7 @@ def _fill_table(engine: Engine, model: type[BaseModel]) -> None:
     if model == Match:
         _fill_matches(session_maker)
 
-@pytest.fixture(scope='session', autouse=True)
+@pytest.fixture(scope='package', autouse=True)
 def prepare_database() -> None:
     engine = get_engine()
     BaseModel.metadata.drop_all(engine)
