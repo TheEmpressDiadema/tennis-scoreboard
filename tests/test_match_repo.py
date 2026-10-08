@@ -2,11 +2,10 @@ import pytest
 
 from uuid import UUID, uuid4
 from contextlib import nullcontext
-from sqlalchemy.exc import IntegrityError
 
 from tests.utils import get_match_repo
 from tennis_scoreboard.models.models import Player, Match
-from tennis_scoreboard.schemas.schemas import Score, SetScore
+from tennis_scoreboard.schemas.score import Score, PlayerScore
 from tennis_scoreboard.errors.db_errors import (
     PlayerNotFoundError,
     MatchNotFoundError
@@ -22,7 +21,7 @@ class TestMatchSqlRepository:
         [
             (
                 Player(id=1, name='Victor'), Player(id=2, name='Dmitriy'),
-                Match(id=3, first_player_id=1, second_player_id=2), nullcontext()
+                Match(id=4, first_player_id=1, second_player_id=2), nullcontext()
             ),
             (
                 Player(id=1, name='Victor'), Player(id=6, name='Aleksandr'),
@@ -44,7 +43,7 @@ class TestMatchSqlRepository:
                     id=1, 
                     first_player_id=1, 
                     second_player_id=2, 
-                    score=Score('Victor', 'Dmitriy')
+                    score=Score()
                 ),
                 nullcontext()
             ),
@@ -54,7 +53,7 @@ class TestMatchSqlRepository:
                     id=2, 
                     first_player_id=2, 
                     second_player_id=3, 
-                    score=Score('Dmitriy', 'Egor')
+                    score=Score()
                 ),
                 nullcontext()
             ),
@@ -86,19 +85,19 @@ class TestMatchSqlRepository:
         [
             (
                 UUID(hex='00000000-0000-0000-0000-000000000001'),
-                Score('Victor', 'Dmitriy', first_set=SetScore(15, 0)),
-                Score('Victor', 'Dmitriy', first_set=SetScore(15, 0)),
+                Score(first_player_score=PlayerScore('15', 0, 0)),
+                Score(first_player_score=PlayerScore('15', 0, 0)),
                 nullcontext()
             ),
             (
                 UUID(hex='00000000-0000-0000-0000-000000000002'),
-                Score('Dmitriy', 'Victor', first_set=SetScore(15, 0)),
-                Score('Dmitriy', 'Victor', first_set=SetScore(15, 0)),
+                Score(first_player_score=PlayerScore('15', 0, 0)),
+                Score(first_player_score=PlayerScore('15', 0, 0)),
                 nullcontext()
             ),
             (
                 uuid4(),
-                Score('Egor', 'Aleksandr', first_set=SetScore(0, 15)),
+                Score(),
                 None,
                 pytest.raises(MatchNotFoundError)
             )
@@ -108,3 +107,15 @@ class TestMatchSqlRepository:
         with raises:
             match = self._repo.update(uuid, score)
             assert match.score == expected
+
+    @pytest.mark.parametrize(
+            "player_id, expected, raises",
+            [
+                (1,1,nullcontext()),
+                (3,0,nullcontext())
+            ]
+    )
+    def test_get_player_ended_matches(self, player_id: int, expected: int, raises: nullcontext) -> None:
+        with raises:
+            ended = self._repo.get_ended_player_matches(player_id)
+            assert len(ended) == expected
