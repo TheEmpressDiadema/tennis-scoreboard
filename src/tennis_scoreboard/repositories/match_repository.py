@@ -15,11 +15,24 @@ class MatchSqlRepository(MatchRepository):
     def __init__(self, session_factory: sessionmaker[Session]):
         self._session_factory = session_factory
 
+    def _get_match_copy(self, match_object: Match) -> Match:
+        return Match(
+            id=match_object.id,
+            uuid=match_object.uuid,
+            first_player_id=match_object.first_player_id,
+            second_player_id=match_object.second_player_id,
+            winner_id=match_object.winner_id,
+            score=match_object.score,
+            winner=match_object.winner,
+            first_player=match_object.first_player,
+            second_player=match_object.second_player
+        )
+
     def get_all(self) -> list[Match]:
         with self._session_factory() as session:
             try:
                 matches = session.query(Match).all()
-                return matches
+                return [self._get_match_copy(obj) for obj in matches]
             except SQLAlchemyError:
                 raise
 
@@ -30,12 +43,12 @@ class MatchSqlRepository(MatchRepository):
                     select(Match).
                     where(Match.uuid==uuid)
                 )
-                match_obj = session.execute(stmt).scalars().one_or_none()
+                match_object = session.execute(stmt).scalars().one_or_none()
 
-                if match_obj is None:
+                if match_object is None:
                     raise MatchNotFoundError
 
-                return match_obj
+                return self._get_match_copy(match_object)
             except SQLAlchemyError:
                 raise
 
@@ -53,7 +66,7 @@ class MatchSqlRepository(MatchRepository):
                     )
                 )
                 matches = session.execute(stmt).scalars()
-                return list(matches)
+                return [self._get_match_copy(obj) for obj in matches]
             except SQLAlchemyError:
                 raise
 
@@ -69,7 +82,7 @@ class MatchSqlRepository(MatchRepository):
                 session.add(match_object)
                 session.commit()
 
-                return match_object
+                return self._get_match_copy(match_object)
             except IntegrityError:
                 session.rollback()
                 raise PlayerNotFoundError
@@ -92,7 +105,7 @@ class MatchSqlRepository(MatchRepository):
 
             try:
                 session.commit()
-                return match_object
+                return self._get_match_copy(match_object)
             except IntegrityError:
                 session.rollback()
                 raise
