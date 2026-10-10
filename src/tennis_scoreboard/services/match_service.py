@@ -5,6 +5,7 @@ from tennis_scoreboard.errors.db_errors import PlayerNotFoundError
 from tennis_scoreboard.repositories.abstract import MatchRepository, PlayerRepository
 from tennis_scoreboard.schemas.match_schema import MatchSchema
 from tennis_scoreboard.schemas.score import Score
+from tennis_scoreboard.services.utils.score_counter import ScoreCounter
 
 
 class MatchService:
@@ -32,11 +33,10 @@ class MatchService:
         )
         return MatchSchema.from_sqlalchemy_model(match)
 
-    def update_match(self, uuid: UUID, score: dict[str, Any]) -> MatchSchema:
-        target_score = Score.from_dict(score)
+    def update_match(self, uuid: UUID, score: Score) -> MatchSchema:
         match = self._match_repo.update(
             uuid,
-            target_score
+            score
         )
         return MatchSchema.from_sqlalchemy_model(match)
 
