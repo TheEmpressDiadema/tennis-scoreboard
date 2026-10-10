@@ -68,7 +68,7 @@ def _fill_table(engine: Engine, model: type[BaseModel]) -> None:
     if model == Match:
         _fill_matches(session_maker)
 
-@pytest.fixture(scope='package', autouse=True)
+@pytest.fixture(scope='module', autouse=True)
 def prepare_database() -> None:
     engine = get_engine()
     BaseModel.metadata.drop_all(engine)
