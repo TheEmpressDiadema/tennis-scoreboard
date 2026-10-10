@@ -12,7 +12,7 @@ def get_engine() -> Engine:
 
 def get_session_factory() -> sessionmaker:
     engine = get_engine()
-    session_maker = sessionmaker(engine, expire_on_commit=False)
+    session_maker = sessionmaker(engine)
     return session_maker
 
 def get_player_repo():
