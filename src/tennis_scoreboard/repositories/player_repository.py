@@ -12,6 +12,9 @@ class PlayerSqlRepository(PlayerRepository):
     def __init__(self, session_factory: sessionmaker[Session]) -> None:
         self._session_factory = session_factory
 
+    def _get_player_copy(self, player: Player) -> Player:
+        return Player(name=player.name, id=player.id)
+
     def add(self, name: str) -> Player:
 
         with self._session_factory() as session:
@@ -20,7 +23,7 @@ class PlayerSqlRepository(PlayerRepository):
                 session.add(player)
                 session.commit()
 
-                return player
+                return self._get_player_copy(player)
             except IntegrityError:
                 session.rollback()
                 raise PlayerExistsError
@@ -36,7 +39,7 @@ class PlayerSqlRepository(PlayerRepository):
                 if player is None:
                     raise PlayerNotFoundError
         
-                return player
+                return self._get_player_copy(player)
             except SQLAlchemyError:
                 raise
 
@@ -52,6 +55,6 @@ class PlayerSqlRepository(PlayerRepository):
                 if player is None:
                     raise PlayerNotFoundError
 
-                return player
+                return self._get_player_copy(player)
             except SQLAlchemyError:
                 raise
