@@ -1,11 +1,9 @@
 from uuid import UUID
-from typing import Any
 
 from tennis_scoreboard.errors.db_errors import PlayerNotFoundError
 from tennis_scoreboard.repositories.abstract import MatchRepository, PlayerRepository
 from tennis_scoreboard.schemas.match_schema import MatchSchema
 from tennis_scoreboard.schemas.score import Score
-from tennis_scoreboard.services.utils.score_counter import ScoreCounter
 
 
 class MatchService:
@@ -32,8 +30,8 @@ class MatchService:
             opponent
         )
         return MatchSchema.from_sqlalchemy_model(match)
-
-    def update_match(self, uuid: UUID, score: Score) -> MatchSchema:
+    
+    def update_match(self, uuid: UUID, score: Score) -> MatchSchema:        
         match = self._match_repo.update(
             uuid,
             score
@@ -51,3 +49,12 @@ class MatchService:
 
         schemas = [MatchSchema.from_sqlalchemy_model(match) for match in matches]
         return schemas
+
+    def get_matches(self, page: int = 1, count: int = 5) -> list[MatchSchema]:
+
+        matches = self._match_repo.get_all()
+
+        lower_bound = count*(page - 1)
+        upper_bound = min(page * count + 1, len(matches))
+
+        return [MatchSchema.from_sqlalchemy_model(matches[i]) for i in range(lower_bound, upper_bound)]
