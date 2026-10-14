@@ -1,7 +1,7 @@
 from waitress import serve
 from jinja2 import Environment, FileSystemLoader
 
-env = Environment(loader=FileSystemLoader('src/frontend/'))
+env = Environment(loader=FileSystemLoader('/view/templates/'))
 
 def wsgiapp(environ, start_response):
     status = '200 OK'
