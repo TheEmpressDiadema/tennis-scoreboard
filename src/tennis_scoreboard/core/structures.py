@@ -1,15 +1,13 @@
 from dataclasses import dataclass, field
-from typing import Any
-
 
 @dataclass
 class HttpRequest:
     method: str
     path: str
-    params: dict[str, Any]
+    params: dict[str, str]
 
-    def __getitem__(self, key: str) -> Any:
-        return self.params.get(key)
+    def __getitem__(self, key: str) -> str:
+        return self.params[key]
 
 
 @dataclass

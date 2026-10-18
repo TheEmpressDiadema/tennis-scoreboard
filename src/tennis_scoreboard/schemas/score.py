@@ -19,10 +19,12 @@ class PlayerScore:
 class Score:
     first_player_score: PlayerScore = PlayerScore()
     second_player_score: PlayerScore = PlayerScore()
+    tiebreak_flag: bool = False
 
     @classmethod
-    def from_dict(cls, data: dict) -> Self:
+    def from_dict(cls, data: dict[str, Any]) -> Self:
         return cls(
             first_player_score=PlayerScore.from_dict(data['first_player_score']),
-            second_player_score=PlayerScore.from_dict(data['second_player_score'])
+            second_player_score=PlayerScore.from_dict(data['second_player_score']),
+            tiebreak_flag=data['tiebreak_flag']
         )
