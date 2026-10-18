@@ -58,16 +58,7 @@ class ScoreService:
                 and loser_score['games'] == self.GAMES_TO_WIN
             )
 
-    def is_match_over(self, score: Score) -> bool:
-        return (
-            score.first_player_score.sets >= self.SETS_TO_WIN
-            or score.second_player_score.sets >= self.SETS_TO_WIN
-        )
-
     def award_point(self, score: Score, score_to_change: str) -> Score:
-
-        if self.is_match_over(score):
-            raise ValueError
 
         score_dict = asdict(score)
 
