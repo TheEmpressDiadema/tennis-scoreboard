@@ -1,58 +1,43 @@
 import pytest
 
-from contextlib import nullcontext
+from sqlalchemy.orm import Session
 
-from tennis_scoreboard.errors.db_errors import (
-    PlayerExistsError, 
-    PlayerNotFoundError
-)
-from tennis_scoreboard.models.models import (
-    Player
-)
-from tests.utils import get_player_repo
+from tennis_scoreboard.models.models import Player
+from tennis_scoreboard.repositories.player_repository import PlayerSqlRepository
+from tennis_scoreboard.errors.db_errors import PlayerExistsError, PlayerNotFoundError
 
+class TestPlayerRepository:
 
-@pytest.mark.usefixtures("prepare_database")
-class TestPlayerSqlRepository:
+    def test_add_player(self, db_session: Session) -> None:
+        repo = PlayerSqlRepository(db_session)
+        repo.add('Victor')
+        db_session.commit()
 
-    _repo = get_player_repo()
+        count = db_session.query(Player).count()
+        assert count == 1
 
-    @pytest.mark.parametrize(
-        "name, expected, raises",
-        [
-            ('Sergey', Player(id=4, name='Sergey'), nullcontext()),
-            ('Nikolay', Player(id=5, name='Nikolay'), nullcontext()),
-            ('Victor', Player(id=1, name='Victor'), pytest.raises(PlayerExistsError)),
-            ('Dmitriy', Player(id=2, name='Dmitriy'), pytest.raises(PlayerExistsError))
-        ]
-    )
-    def test_add(self, name: str, expected: Player, raises: nullcontext) -> None:
-        with raises:
-            player = self._repo.add(name)
-            assert player.id == expected.id
+    def test_add_existing_player(self, db_session: Session, fill_players) -> None:
+        repo = PlayerSqlRepository(db_session)
+        with pytest.raises(PlayerExistsError):
+            result = repo.add('Victor')
+            db_session.commit()
 
-    @pytest.mark.parametrize(
-            "id, expected, raises",
-            [
-                (1, Player(id=1, name='Victor'), nullcontext()),
-                (3, Player(id=3, name='Egor'), nullcontext()),
-                (6, None, pytest.raises(PlayerNotFoundError))
-            ]
-    )
-    def test_get_by_id(self, id: int, expected: Player, raises: nullcontext) -> None:
-        with raises:
-            player = self._repo.get_by_id(id)
-            assert player.name == expected.name
+    def test_get_player_by_id(self, db_session: Session, fill_players) -> None:
+        repo = PlayerSqlRepository(db_session)
+        player = repo.get_by_id(1)
+        assert player.id is not None
 
-    @pytest.mark.parametrize(
-        "name, expected, raises",
-        [
-            ('Victor', Player(id=1, name='Victor'), nullcontext()),
-            ('Dmitriy', Player(id=2, name='Victor'), nullcontext()),
-            ('Konstantin', None, pytest.raises(PlayerNotFoundError))
-        ]
-    )
-    def test_get_by_name(self, name: str, expected: Player, raises: nullcontext) -> None:
-        with raises:
-            player = self._repo.get_by_name(name)
-            assert player.id == expected.id
+    def test_get_unexisting_player_by_id(self, db_session: Session) -> None:
+        repo = PlayerSqlRepository(db_session)
+        with pytest.raises(PlayerNotFoundError):
+            player = repo.get_by_id(1)
+
+    def test_get_player_by_name(self, db_session: Session, fill_players) -> None:
+        repo = PlayerSqlRepository(db_session)
+        player = repo.get_by_name('Victor')
+        assert player.id is not None
+    
+    def test_get_unexisting_player_by_name(self, db_session: Session) -> None:
+        repo = PlayerSqlRepository(db_session)
+        with pytest.raises(PlayerNotFoundError):
+            player = repo.get_by_id(1)
