@@ -1,78 +1,92 @@
 import pytest
 
 from uuid import UUID
-from sqlalchemy import Engine
-from sqlalchemy.orm import sessionmaker, Session
-from sqlalchemy import insert
+from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy import Connection, create_engine, Engine
 
-from tests.utils import get_engine
+from tennis_scoreboard.core.db_config import DBConfig
 from tennis_scoreboard.schemas.score import Score, PlayerScore
-from tennis_scoreboard.models.models import (
-    BaseModel,
-    Player,
-    Match
-)
+from tennis_scoreboard.services.match_service import MatchService
+from tennis_scoreboard.repositories.unit_of_work import UnitOfWork
+from tennis_scoreboard.models.models import BaseModel, Player, Match
 
-def _fill_player(session_factory: sessionmaker[Session]) -> None:
-    players = [
-        Player(name='Victor'),
-        Player(name='Dmitriy'),
-        Player(name='Egor')
-    ]
+@pytest.fixture(scope='session')
+def engine():
+    engine = create_engine(DBConfig.get_database_url('test_db_config.toml', 'server_security.toml'))
 
-    with session_factory() as session:
-        for player in players:
-            stmt = insert(Player).values({"name" : player.name})
-            session.execute(stmt)
-        session.commit()
-            
+    BaseModel.metadata.create_all(engine)
 
-def _fill_matches(session_factory: sessionmaker[Session]) -> None:
+    yield engine
+    
+    BaseModel.metadata.drop_all(engine)
+
+@pytest.fixture
+def connection(engine: Engine):
+    connection = engine.connect()
+    transaction = connection.begin()
+
+    yield connection
+
+    transaction.rollback()
+    connection.close()
+
+@pytest.fixture
+def db_session(connection: Connection):
+    session = Session(bind=connection, join_transaction_mode='create_savepoint')
+
+    yield session
+
+    session.rollback()
+    session.close()
+
+@pytest.fixture
+def fill_matches(db_session: Session, fill_players) -> list[Match]:
     matches = [
         Match(
-            uuid=UUID(hex='00000000-0000-0000-0000-000000000001'),
+            id=1,
+            uuid=UUID('00000000-0000-0000-0000-0000-00000001'),
             first_player_id=1,
             second_player_id=2,
-            score=Score()
-            ),
-        Match(
-            uuid=UUID(hex='00000000-0000-0000-0000-000000000002'),
-            first_player_id=2,
-            second_player_id=3,
+            winner_id=None,
             score=Score()
         ),
-        Match (
-            uuid=UUID(hex='00000000-0000-0000-0000-000000000003'),
-            first_player_id=1,
-            second_player_id=2,
+        Match(
+            id=2,
+            uuid=UUID('00000000-0000-0000-0000-0000-00000002'),
+            first_player_id=2,
+            second_player_id=3,
             winner_id=2,
-            score=Score(
-                first_player_score=PlayerScore(
-                    games=2
-                ),
-                second_player_score=PlayerScore(
-                    games=1
-                )
-            )
+            score=Score(PlayerScore('0', 2, 0), PlayerScore('0', 1, 0))
+        ),
+        Match(
+            id=3,
+            uuid=UUID('00000000-0000-0000-0000-0000-00000003'),
+            first_player_id=1,
+            second_player_id=3,
+            winner_id=1,
+            score=Score(PlayerScore('0', 2, 0), PlayerScore('0', 1, 0))
         )
     ]
-    with session_factory() as session:
-        session.add_all(matches)
-        session.commit()
+    db_session.add_all(matches)
+    db_session.commit()
+    return matches
 
-def _fill_table(engine: Engine, model: type[BaseModel]) -> None:
-    session_maker = sessionmaker(engine)
+@pytest.fixture
+def fill_players(db_session: Session) -> list[Player]:
 
-    if model == Player:
-        _fill_player(session_maker)
-    if model == Match:
-        _fill_matches(session_maker)
+    players = [
+        Player(id=1, name='Victor'),
+        Player(id=2, name='Dmitriy'),
+        Player(id=3, name='Egor')
+    ]
+    db_session.add_all(players)
+    db_session.commit()
+    return players
 
-@pytest.fixture(scope='module', autouse=True)
-def prepare_database() -> None:
-    engine = get_engine()
-    BaseModel.metadata.drop_all(engine)
-    BaseModel.metadata.create_all(engine)
-    
-    _fill_table(engine, Player)
-    _fill_table(engine, Match)
+@pytest.fixture
+def uow(connection: Connection) -> UnitOfWork:
+    return UnitOfWork(sessionmaker(bind=connection, join_transaction_mode='create_savepoint'))
+
+@pytest.fixture
+def match_service(uow: UnitOfWork) -> MatchService:
+    return MatchService(uow)
