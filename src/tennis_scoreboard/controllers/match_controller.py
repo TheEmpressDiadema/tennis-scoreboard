@@ -12,6 +12,5 @@ class MatchController:
             first_player = request['first_player']
             second_player = request['second_player']
 
-            return HttpResponse(200, 'jopa')
         except:
-            return HttpResponse(400, 'gg')
+            return HttpResponse()
