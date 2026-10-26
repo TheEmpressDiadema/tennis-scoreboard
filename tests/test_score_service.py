@@ -1,5 +1,4 @@
 import pytest
-from contextlib import nullcontext
 
 from tennis_scoreboard.schemas.score import Score, PlayerScore
 from tennis_scoreboard.services.score_service import ScoreService
@@ -31,17 +30,55 @@ class TestScoreService:
                 Score(PlayerScore('40'), PlayerScore('AD')),
                 'first_player_score',
                 Score(PlayerScore('40'), PlayerScore('40'))
+            )
+        ]
+    )
+    def test_award_point(self, score: Score, score_to_change: str, expected: Score) -> None:
+        result = self._score_service.award_point(score, score_to_change)
+        assert result == expected
+
+    @pytest.mark.parametrize(
+        "score, score_to_change, expected",
+        [
+            (
+                Score(PlayerScore('0', 0, 6), PlayerScore('0', 0, 6), tiebreak_flag=True),
+                'first_player_score',
+                Score(PlayerScore('1', 0, 6), PlayerScore('0', 0, 6), tiebreak_flag=True)
             ),
             (
-                Score(PlayerScore('40'), PlayerScore()),
+                Score(PlayerScore('2', 0, 6), PlayerScore('2', 0, 6), tiebreak_flag=True),
                 'first_player_score',
-                Score(PlayerScore('0', 0, 1))
-            ),
+                Score(PlayerScore('3', 0, 6), PlayerScore('2', 0, 6), tiebreak_flag=True)
+            )
+        ]
+    )
+    def test_award_tiebreak_point(self, score: Score, score_to_change: str, expected: Score) -> None:
+        result = self._score_service.award_point(score, score_to_change)
+        assert result == expected
+
+
+    @pytest.mark.parametrize(
+        "score, score_to_change, expected",
+        [
             (
                 Score(PlayerScore('40'), PlayerScore('AD')),
                 'second_player_score',
                 Score(PlayerScore('0', 0, 0), PlayerScore('0', 0, 1))
             ),
+            (
+                Score(PlayerScore('40'), PlayerScore()),
+                'first_player_score',
+                Score(PlayerScore('0', 0, 1))
+            )
+        ]
+    )
+    def test_award_game(self, score: Score, score_to_change: str, expected: Score) -> None:
+        result = self._score_service.award_point(score, score_to_change)
+        assert result == expected
+
+    @pytest.mark.parametrize(
+        "score, score_to_change, expected",
+        [
             (
                 Score(PlayerScore('40', 0, 5), PlayerScore()),
                 'first_player_score',
@@ -53,17 +90,31 @@ class TestScoreService:
                 Score(PlayerScore('0', 1, 0), PlayerScore('0', 0, 0))
             ),
             (
-                Score(PlayerScore('0', 0, 6), PlayerScore('0', 0, 6), tiebreak_flag=True),
-                'first_player_score',
-                Score(PlayerScore('1', 0, 6), PlayerScore('0', 0, 6), tiebreak_flag=True)
-            ),
-            (
                 Score(PlayerScore('6', 0, 6), PlayerScore('6', 0, 6), tiebreak_flag=True),
                 'first_player_score',
                 Score(PlayerScore('0', 1, 0), PlayerScore('0', 0, 0), tiebreak_flag=False)
             )
         ]
     )
-    def test_award_point(self, score: Score, score_to_change: str, expected: Score) -> None:
+    def test_award_set(self, score: Score, score_to_change: str, expected: Score) -> None:
+        result = self._score_service.award_point(score, score_to_change)
+        assert result == expected
+
+    @pytest.mark.parametrize(
+        "score, score_to_change, expected",
+        [
+            (
+                Score(PlayerScore('0', 0, 6), PlayerScore('40', 0, 5)),
+                'second_player_score',
+                Score(PlayerScore('0', 0, 6), PlayerScore('0', 0, 6), tiebreak_flag=True)
+            ),
+            (
+                Score(PlayerScore('40', 0, 5), PlayerScore('0', 0, 6)),
+                'first_player_score',
+                Score(PlayerScore('0', 0, 6), PlayerScore('0', 0, 6), tiebreak_flag=True)
+            )
+        ]
+    )
+    def test_run_overtime(self, score: Score, score_to_change: str, expected: Score) -> None:
         result = self._score_service.award_point(score, score_to_change)
         assert result == expected
