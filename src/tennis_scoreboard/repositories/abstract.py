@@ -1,8 +1,17 @@
 from uuid import UUID
 from typing import Protocol
+from abc import ABC, abstractmethod
+
+from sqlalchemy.orm import Session
 
 from tennis_scoreboard.schemas.score import Score
 from tennis_scoreboard.models.models import Player, Match
+
+
+class BaseRepository(ABC):
+
+    def __init__(self, session: Session):
+        self._session = session
 
 class PlayerRepository(Protocol):
 
