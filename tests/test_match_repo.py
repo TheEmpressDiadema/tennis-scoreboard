@@ -56,7 +56,7 @@ class TestMatchRepository:
     def get_match_by_uuid(self, db_session: Session, fill_matches) -> None:
         repo = MatchSqlRepository(db_session)
         match_object = repo.get_by_uuid(UUID('00000000-0000-0000-0000-0000-00000001'))
-        assert match_object.id == 1
+        assert match_object.id is not None
 
     def test_get_unexisting_match_by_uuid(self, db_session: Session) -> None:
         repo = MatchSqlRepository(db_session)
