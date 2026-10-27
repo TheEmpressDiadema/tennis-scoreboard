@@ -1,16 +1,10 @@
-from tennis_scoreboard.core.structures import HttpRequest, HttpResponse
 from tennis_scoreboard.services.match_service import MatchService
+from tennis_scoreboard.services.score_service import ScoreService
+from tennis_scoreboard.core.structures import HttpRequest, HttpResponse
 
 
 class MatchController:
 
-    def __init__(self, service: MatchService):
-        self._service = service
-
-    def create_match(self, request: HttpRequest) -> HttpResponse:
-        try:
-            first_player = request['first_player']
-            second_player = request['second_player']
-
-        except:
-            return HttpResponse()
+    def __init__(self, match_service: MatchService, score_service: ScoreService):
+        self._match_service = match_service
+        self._score_service = score_service
