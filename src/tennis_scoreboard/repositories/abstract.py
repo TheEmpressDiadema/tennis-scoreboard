@@ -1,6 +1,6 @@
 from uuid import UUID
 from typing import Protocol
-from abc import ABC, abstractmethod
+from abc import ABC
 
 from sqlalchemy.orm import Session
 
@@ -31,4 +31,4 @@ class MatchRepository(Protocol):
 
     def add(self, actor: Player, opponent: Player) -> Match: ...
 
-    def update(self, uuid: UUID, score: Score) -> Match: ...
+    def update(self, uuid: UUID, score: Score, winner_id: int | None = None) -> Match: ...
