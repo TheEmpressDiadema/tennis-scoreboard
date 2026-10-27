@@ -42,19 +42,18 @@ class MatchSqlRepository(BaseRepository, MatchRepository):
             return [obj for obj in matches]
 
     def add(self, actor: Player, opponent: Player) -> Match:
-        score = Score()
-
         match_object = Match(
             uuid=uuid4(), 
             first_player_id=actor.id, 
             second_player_id=opponent.id, 
-            score=score)
+            score=Score()
+        )
         self._session.add(match_object)
         self._session.flush()
         return match_object
             
 
-    def update(self, uuid: UUID, score: Score) -> Match:
+    def update(self, uuid: UUID, score: Score, winner_id: int | None = None) -> Match:
         stmt = (
             select(Match).
             where(Match.uuid==uuid)
@@ -65,5 +64,7 @@ class MatchSqlRepository(BaseRepository, MatchRepository):
             raise MatchNotFoundError
 
         match_object.score = score
+        match_object.winner_id = winner_id
+        
         self._session.flush()
         return match_object
