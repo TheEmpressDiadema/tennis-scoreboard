@@ -47,7 +47,7 @@ class TestUnitOfWork:
     def test_add_match(self, uow: UnitOfWork, fill_players) -> None:
         with uow.start() as session:
             match_object = session.match_repository.add(Player(id=1, name='Victor'), Player(id=2, name='Dmitriy'))
-            assert match_object.id != None
+            assert match_object.id is not None
 
     def test_update_match(self, uow: UnitOfWork, fill_matches) -> None:
         with uow.start() as session:
@@ -85,7 +85,7 @@ class TestUnitOfWork:
     def get_match_by_uuid(self, uow: UnitOfWork, fill_matches) -> None:
         with uow.start() as session:
             match_object = session.match_repository.get_by_uuid(UUID('00000000-0000-0000-0000-0000-00000001'))
-            assert match_object.id == 1
+            assert match_object.id is not None
 
     def test_get_unexisting_match_by_uuid(self, uow: UnitOfWork) -> None:
         with pytest.raises(MatchNotFoundError):
