@@ -5,8 +5,9 @@ from tennis_scoreboard.models.models import Player
 
 @dataclass(frozen=True)
 class PlayerSchema:
-    name: str
 
+    name: str
+    
     id: int | None = field(default=None)
 
     @classmethod
