@@ -1,6 +1,5 @@
 from tennis_scoreboard.services.match_service import MatchService
 from tennis_scoreboard.services.score_service import ScoreService
-from tennis_scoreboard.core.structures import HttpRequest, HttpResponse
 
 
 class MatchController:
