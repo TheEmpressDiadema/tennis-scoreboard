@@ -39,23 +39,23 @@ class MatchService:
         
             return MatchSchema.from_sqlalchemy_model(match_object)
 
-    def update_match(self, uuid: UUID, score: Score) -> MatchSchema:  
+    def update_match(self, uuid: str, score: Score) -> MatchSchema:  
         with self._unit_of_work.start() as session:
-            match_object = session.match_repository.get_by_uuid(uuid)
+            match_object = session.match_repository.get_by_uuid(UUID(uuid))
 
             winner_id = self._define_winner(match_object, score)
 
             match_schema = session.match_repository.update(
-                uuid,
+                UUID(uuid),
                 score,
                 winner_id=winner_id
             )
             return MatchSchema.from_sqlalchemy_model(match_schema)
 
-    def get_match_by_uuid(self, uuid: UUID) -> MatchSchema:
+    def get_match_by_uuid(self, uuid: str) -> MatchSchema:
         with self._unit_of_work.start() as session:
             return MatchSchema.from_sqlalchemy_model(
-                session.match_repository.get_by_uuid(uuid)
+                session.match_repository.get_by_uuid(UUID(uuid))
             )
 
     def get_player_ended_matches(self, name: str) -> list[MatchSchema]:
