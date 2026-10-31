@@ -1,6 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}{{ view.title }}{% endblock %}
+{% block title %}Create match{% endblock %}
 
 {% block content %}
+    <form action="/new-match" method="post">
+        <input type="text" name="first_player_name" />
+        <input type="text" name="second_player_name" />
+        <button type="submit">Create match</button>
+    </form>
 {% endblock %}
