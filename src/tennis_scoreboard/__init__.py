@@ -1,12 +1,12 @@
 import os
 import logging
 from typing import Any, Callable
-from waitress import serve
-from tennis_scoreboard.views.loader import TemplateLoader
+import waitress
+from jinja2 import FileSystemLoader, Environment
 
 static_path = os.path.join(os.getcwd(), 'frontend', 'static')
 templates_path = os.path.join(os.getcwd(), 'frontend', 'templates')
-template_loader = TemplateLoader()
+env = Environment(loader=FileSystemLoader(templates_path))
 logger = logging.getLogger('waitress')
 logger.setLevel(logging.INFO)
 
@@ -50,9 +50,11 @@ def wsgiapp(environ: dict[str, str], start_response: Callable) -> list[bytes]:
         status = '404 Not Found'
         template_name = '404.html'
 
-    template = template_loader.load_template(template_name)
+    template = env.get_template(template_name)
     start_response(status, headers)
     return [template.render().encode('utf-8')]
 
 def main() -> None:
-    serve(wsgiapp, listen='127.0.0.1:8080')
+    waitress.serve(wsgiapp, listen='127.0.0.1:8080')
+
+main()
