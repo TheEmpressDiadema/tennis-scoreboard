@@ -10,13 +10,13 @@ from tennis_scoreboard.schemas.score import Score
 class MatchSchema:
 
     id: int 
+    uuid: str
     first_player: PlayerSchema
     second_player: PlayerSchema
     score: Score
 
     winner_id: int | None = field(default=None)
     winner: PlayerSchema | None = field(default=None)
-    uuid: UUID | None = field(default=None)
 
     @classmethod
     def from_sqlalchemy_model(cls, match: Match) -> Self:
@@ -24,7 +24,7 @@ class MatchSchema:
         winner = None if match.winner is None else PlayerSchema.from_sqlalchemy_model(match.winner)
         return cls(
             id=match.id,
-            uuid=match.uuid,
+            uuid=str(match.uuid),
             first_player=PlayerSchema.from_sqlalchemy_model(match.first_player),
             second_player=PlayerSchema.from_sqlalchemy_model(match.second_player),
             winner_id=winner_id,
