@@ -1,10 +1,11 @@
 from http import HTTPStatus
-from typing import Any
+from typing import Any, Self
 from dataclasses import dataclass, field
 
 from tennis_scoreboard.views.views import BaseView
 
-@dataclass
+
+@dataclass(frozen=True)
 class HttpRequest:
 
     method: str
@@ -12,9 +13,16 @@ class HttpRequest:
     params: dict[str, Any]
     body: dict[str, Any]
 
-@dataclass
+@dataclass(frozen=True)
 class HttpResponse:
 
+    view: BaseView | None = field(default=None)
     status: HTTPStatus = field(default=HTTPStatus.OK)
-    headers: list[tuple[str, str]] = field(default_factory = lambda :[('Content-type', 'text/html')])
-    view: BaseView = field(default_factory=BaseView)
+    headers: list[tuple[str, str]] = field(default_factory = lambda : [('Content-type', 'text/html')])
+
+    @classmethod
+    def redirect(cls, location: str) -> Self:
+        return cls(
+            status=HTTPStatus.SEE_OTHER,
+            headers=[('Location', location), (('Content-type', 'text/html'))]
+        )
