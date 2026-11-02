@@ -4,7 +4,7 @@ from dataclasses import dataclass, asdict, field
 from tennis_scoreboard.schemas.match_schema import MatchSchema
 
 
-@dataclass
+@dataclass(frozen=True)
 class BaseView:
 
     title: str = 'Tennis Scoreboard'
@@ -13,27 +13,27 @@ class BaseView:
     def context(self) -> dict[str, Any]:
         return asdict(self)
 
-@dataclass
+@dataclass(frozen=True)
 class NewMatchView(BaseView):
 
     title: str = 'Create new match'
     template: str = 'new_match.html'
 
-@dataclass
+@dataclass(frozen=True)
 class MatchListView(BaseView):
 
     title: str = 'Matches'
     template: str = 'match_list.html'
     matches: list[MatchSchema] = field(default_factory=list)
 
-@dataclass
+@dataclass(frozen=True)
 class MatchScoreView(BaseView):
 
     title: str = 'Match score'
     template: str = 'match_score.html'
     match_schema: MatchSchema | None = field(default=None)
 
-@dataclass
+@dataclass(frozen=True)
 class NotFoundView(BaseView):
 
     title: str = 'Not Found'
