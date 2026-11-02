@@ -23,14 +23,14 @@ class TestMatchService:
 
     def test_update_match(self, match_service: MatchService, fill_matches) -> None:
         match_schema = match_service.update_match(
-            UUID('00000000-0000-0000-0000-0000-00000001'),
+            '00000000-0000-0000-0000-0000-00000001',
             Score(PlayerScore('15', 0, 0), PlayerScore('0', 0, 0))
         )
         assert match_schema.score == Score(PlayerScore('15', 0, 0), PlayerScore('0', 0, 0))
 
     def test_update_end_match(self, match_service: MatchService, fill_matches) -> None:
         match_schema = match_service.update_match(
-            UUID('00000000-0000-0000-0000-0000-00000001'),
+            '00000000-0000-0000-0000-0000-00000001',
             Score(PlayerScore('0', 2, 0), PlayerScore('0', 1, 0))
         )
         assert match_schema.winner_id is not None
@@ -38,17 +38,17 @@ class TestMatchService:
     def test_update_unexisting_match(self, match_service: MatchService) -> None:
         with pytest.raises(MatchNotFoundError):
             match_schema = match_service.update_match(
-                UUID('00000000-0000-0000-0000-0000-00000001'),
+                '00000000-0000-0000-0000-0000-00000001',
                 Score(PlayerScore('15', 0, 0), PlayerScore('0', 0, 0))
             )
 
     def test_get_match_by_uuid(self, match_service: MatchService, fill_matches) -> None:
-        match_schema = match_service.get_match_by_uuid(UUID('00000000-0000-0000-0000-0000-00000001'))
+        match_schema = match_service.get_match_by_uuid('00000000-0000-0000-0000-0000-00000001')
         assert match_schema.id is not None
 
     def test_get_unexisting_match_by_uuid(self, match_service: MatchService) -> None:
         with pytest.raises(MatchNotFoundError):
-            match_schema = match_service.get_match_by_uuid(UUID('00000000-0000-0000-0000-0000-00000001'))
+            match_schema = match_service.get_match_by_uuid('00000000-0000-0000-0000-0000-00000001')
 
     def test_get_matches(self, match_service: MatchService, fill_matches) -> None:
         match_schemas = match_service.get_matches()
