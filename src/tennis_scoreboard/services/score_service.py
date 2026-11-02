@@ -2,6 +2,7 @@ from dataclasses import asdict
 from typing import Any
 
 from tennis_scoreboard.schemas.score import Score
+from tennis_scoreboard.errors.score_errors import MatchEnded
 
 
 class ScoreService:
@@ -58,7 +59,18 @@ class ScoreService:
                 and loser_score['games'] == self.GAMES_TO_WIN
             )
 
+    def _check_ended(self, score: Score) -> bool:
+        return any(
+            [
+                score.first_player_score.sets == 2, 
+                score.first_player_score.sets == 2
+            ]
+        )
+
     def award_point(self, score: Score, score_to_change: str) -> Score:
+
+        if self._check_ended(score):
+            raise MatchEnded
 
         score_dict = asdict(score)
 
