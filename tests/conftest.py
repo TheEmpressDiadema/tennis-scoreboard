@@ -7,8 +7,10 @@ from sqlalchemy import Connection, create_engine, Engine
 from tennis_scoreboard.core.db_config import DBConfig
 from tennis_scoreboard.schemas.score import Score, PlayerScore
 from tennis_scoreboard.services.match_service import MatchService
+from tennis_scoreboard.services.score_service import ScoreService
 from tennis_scoreboard.repositories.unit_of_work import UnitOfWork
 from tennis_scoreboard.models.models import BaseModel, Player, Match
+from tennis_scoreboard.controllers.match_controller import MatchController
 
 @pytest.fixture(scope='session')
 def engine():
@@ -90,3 +92,11 @@ def uow(connection: Connection) -> UnitOfWork:
 @pytest.fixture
 def match_service(uow: UnitOfWork) -> MatchService:
     return MatchService(uow)
+
+@pytest.fixture
+def score_service() -> ScoreService:
+    return ScoreService()
+
+@pytest.fixture
+def match_controller(match_service: MatchService, score_service: ScoreService) -> MatchController:
+    return MatchController(match_service, score_service)
