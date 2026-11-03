@@ -10,8 +10,12 @@ from tennis_scoreboard.errors.db_errors import MatchNotFoundError
 
 class MatchSqlRepository(BaseRepository, MatchRepository):
 
-    def get_all(self) -> list[Match]:
-        matches = self._session.query(Match).all()
+    def get_ended_matches(self) -> list[Match]:
+        stmt = (
+            select(Match).
+            where(Match.winner_id.is_not(None))
+        )
+        matches = self._session.execute(stmt).scalars()
         return [obj for obj in matches]
 
     def get_by_uuid(self, uuid: UUID) -> Match:
