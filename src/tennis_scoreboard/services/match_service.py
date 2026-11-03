@@ -58,17 +58,20 @@ class MatchService:
                 session.match_repository.get_by_uuid(UUID(uuid))
             )
 
-    def get_player_ended_matches(self, name: str) -> list[MatchSchema]:
+    def get_player_ended_matches(self, name: str, page: int = 1, count: int = 5) -> list[MatchSchema]:
         with self._unit_of_work.start() as session:
             player = session.player_repository.get_by_name(name)
             matches = session.match_repository.get_ended_player_matches(player.id)
 
-            schemas = [MatchSchema.from_sqlalchemy_model(match) for match in matches]
+            lower_bound = count*(page - 1)
+            upper_bound = min(page * count, len(matches))
+
+            schemas = [MatchSchema.from_sqlalchemy_model(matches[i]) for i in range(lower_bound, upper_bound)]
             return schemas
 
-    def get_matches(self, page: int = 1, count: int = 5) -> list[MatchSchema]:
+    def get_ended_matches(self, page: int = 1, count: int = 5) -> list[MatchSchema]:
         with self._unit_of_work.start() as session:
-            matches = session.match_repository.get_all()
+            matches = session.match_repository.get_ended_matches()
 
             lower_bound = count*(page - 1)
             upper_bound = min(page * count, len(matches))
