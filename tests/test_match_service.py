@@ -51,16 +51,16 @@ class TestMatchService:
             match_schema = match_service.get_match_by_uuid('00000000-0000-0000-0000-0000-00000001')
 
     def test_get_matches(self, match_service: MatchService, fill_matches) -> None:
-        match_schemas = match_service.get_matches()
-        assert len(match_schemas) == 3
+        match_schemas = match_service.get_ended_matches()
+        assert len(match_schemas) == 2
 
     def test_get_two_matches_by_page(self, match_service: MatchService, fill_matches) -> None:
-        match_schemas = match_service.get_matches(count=2)
+        match_schemas = match_service.get_ended_matches(count=2)
         assert len(match_schemas) == 2
 
     def test_get_second_page_matches(self, match_service: MatchService, fill_matches) -> None:
-        match_schemas = match_service.get_matches(page=2, count=2)
-        assert len(match_schemas) == 1
+        match_schemas = match_service.get_ended_matches(page=2, count=2)
+        assert len(match_schemas) == 0
 
     def test_get_ended_player_matches(self, match_service: MatchService, fill_matches) -> None:
         match_schemas = match_service.get_player_ended_matches('Egor')
