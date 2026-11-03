@@ -2,15 +2,9 @@ import pytest
 
 from http import HTTPStatus
 
+from tennis_scoreboard.controllers.structures import HttpRequest
 from tennis_scoreboard.controllers.match_controller import MatchController
-from tennis_scoreboard.controllers.structures import HttpResponse, HttpRequest
-from tennis_scoreboard.views.views import (
-    MatchListView,
-    MatchScoreView,
-    NewMatchView,
-    NotFoundView
-)
-
+from tennis_scoreboard.views.views import MatchListView
 
 class TestMatchController:
 
@@ -47,7 +41,8 @@ class TestMatchController:
             HttpRequest(
                 method='GET',
                 path='/new-match',
-                params={},
+                params={
+                },
                 body={
                 }
             )
@@ -98,3 +93,43 @@ class TestMatchController:
             )
         )
         assert response.status == HTTPStatus.IM_A_TEAPOT
+
+    def test_get_matches(self, match_controller: MatchController, fill_matches) -> None:
+        response = match_controller.get_matches(
+            HttpRequest(
+                method='GET',
+                path='/matches',
+                params={},
+                body={}
+            )
+        )
+        assert response.status == HTTPStatus.OK
+
+    def test_get_second_page(self, match_controller: MatchController, fill_matches) -> None:
+        response = match_controller.get_matches(
+            HttpRequest(
+                method='GET',
+                path='/matches?page=$page_number&filter_by_player_name=$player_name',
+                params={
+                    'page_number' : '2'
+                },
+                body={}
+            )
+        )
+        assert response.status == HTTPStatus.OK
+        assert isinstance(response.view, MatchListView)
+
+    def test_get_letter_page(self, match_controller: MatchController, fill_matches) -> None:
+        response = match_controller.get_matches(
+            HttpRequest(
+                method='GET',
+                path='/matches?page=$page_number&filter_by_player_name=$player_name',
+                params={
+                    'page_number' : 'abacaba'
+                },
+                body={
+
+                }
+            )
+        )
+        assert response.status == HTTPStatus.INTERNAL_SERVER_ERROR
