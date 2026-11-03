@@ -38,10 +38,10 @@ class TestMatchRepository:
                 score
             )
 
-    def test_get_all_matches(self, db_session: Session, fill_matches) -> None:
+    def test_get_ended_matches(self, db_session: Session, fill_matches) -> None:
         repo = MatchSqlRepository(db_session)
-        matches = repo.get_all()
-        assert len(matches) == 3
+        matches = repo.get_ended_matches()
+        assert len(matches) == 2
 
     def test_get_player_ended_matches(self, db_session: Session, fill_matches) -> None:
         repo = MatchSqlRepository(db_session)
