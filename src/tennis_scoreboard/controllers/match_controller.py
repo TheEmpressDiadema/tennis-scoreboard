@@ -76,8 +76,8 @@ class MatchController:
 
     def get_matches(self, request: HttpRequest) -> HttpResponse:
         try:
-            player_name = request.body.get('player_name')
-            page = request.params.get('page')
+            player_name = request.body.get('filter_by_player_name')
+            page = request.params.get('page_number')
 
             if page is None:
                 page = 1
@@ -85,9 +85,9 @@ class MatchController:
                 page = int(page)
 
             if player_name is None:
-                schemas = self._match_service.get_matches(page=page)
+                schemas = self._match_service.get_ended_matches(page=page)
             else:
-                schemas = self._match_service.get_player_ended_matches(player_name)
+                schemas = self._match_service.get_player_ended_matches(player_name, page=page)
             
             return HttpResponse(
                 status=HTTPStatus.OK,
