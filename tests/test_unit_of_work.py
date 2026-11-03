@@ -67,10 +67,10 @@ class TestUnitOfWork:
                     Score(PlayerScore('15', 0, 0), PlayerScore('0', 0, 0))
                 )
 
-    def test_get_all_matches(self, uow: UnitOfWork, fill_matches) -> None:
+    def test_get_ended_matches(self, uow: UnitOfWork, fill_matches) -> None:
         with uow.start() as session:
-            matches = session.match_repository.get_all()
-            assert len(matches) == 3
+            matches = session.match_repository.get_ended_matches()
+            assert len(matches) == 2
 
     def test_get_player_ended_matches(self, uow: UnitOfWork, fill_matches) -> None:
         with uow.start() as session:
