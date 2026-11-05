@@ -4,6 +4,7 @@ from uuid import UUID
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy import Connection, create_engine, Engine
 
+from tennis_scoreboard.app.router import Router
 from tennis_scoreboard.core.db_config import DBConfig
 from tennis_scoreboard.schemas.score import Score, PlayerScore
 from tennis_scoreboard.services.match_service import MatchService
@@ -100,3 +101,11 @@ def score_service() -> ScoreService:
 @pytest.fixture
 def match_controller(match_service: MatchService, score_service: ScoreService) -> MatchController:
     return MatchController(match_service, score_service)
+
+@pytest.fixture
+def router(match_controller: MatchController) -> Router:
+    router = Router()
+    router.register_route('GET', 'matches', match_controller.get_matches)
+    router.register_route('GET', 'match-score', match_controller.get_match)
+    router.register_route('GET', 'new-match', match_controller.get_create_match_page)
+    return router
