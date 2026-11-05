@@ -119,7 +119,7 @@ class TestMatchController:
         assert response.status == HTTPStatus.OK
         assert isinstance(response.view, MatchListView)
 
-    def test_get_letter_page(self, match_controller: MatchController, fill_matches) -> None:
+    def test_get_page_with_letter_number(self, match_controller: MatchController, fill_matches) -> None:
         response = match_controller.get_matches(
             HttpRequest(
                 method='GET',
