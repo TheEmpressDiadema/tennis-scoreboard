@@ -9,4 +9,4 @@ class Renderer:
         self._env = Environment(loader=FileSystemLoader(tempalates_path))
 
     def render(self, view: BaseView) -> bytes:
-        return self._env.get_template(view.template, **view.context()).render().encode()
+        return self._env.get_template(name=view.template).render(**view.context()).encode()
