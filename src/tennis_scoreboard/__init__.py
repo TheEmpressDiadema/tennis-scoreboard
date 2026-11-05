@@ -1,58 +1,34 @@
-import os
-import logging
-from typing import Any, Callable
 import waitress
-from jinja2 import FileSystemLoader, Environment
 
-static_path = os.path.join(os.getcwd(), 'frontend', 'static')
-templates_path = os.path.join(os.getcwd(), 'frontend', 'templates')
-env = Environment(loader=FileSystemLoader(templates_path))
-logger = logging.getLogger('waitress')
-logger.setLevel(logging.INFO)
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
-ROUTES = {
-    '/': 'index.html',
-    '/match-score' : 'match_score.html',
-    '/new-match': 'new_match.html',
-    '/matches': 'match_list.html'
-}
-
-def serve_static(path: str, start_response: Callable) -> list[bytes]:
-    relative_path = path.removeprefix('/static/')
-    file_path = os.path.realpath(os.path.join(static_path, relative_path))
-
-    if not os.path.isfile(file_path) or not os.path.exists(file_path):
-        start_response('404 Not Found', [('Content-type', 'text/plain')])
-        return [b'Not found']
-
-    content_type = 'text/plain'
-    
-    if file_path.endswith('.css'):
-        content_type = 'text/css'
-    headers = [
-        ('Content-type', content_type)
-    ]
-    start_response('200 OK', headers)
-    with open(file_path, 'rb') as f:
-        return [f.read()]
-
-def wsgiapp(environ: dict[str, str], start_response: Callable) -> list[bytes]:
-    path = environ.get('PATH_INFO', '/')
-    headers = [('Content-type', 'text/html; charset=utf-8')]
-
-    if path.startswith('/static'):
-        return serve_static(path, start_response)
-
-    template_name = ROUTES.get(path)
-    if template_name is not None:
-        status = '200 OK'
-    else:
-        status = '404 Not Found'
-        template_name = '404.html'
-
-    template = env.get_template(template_name)
-    start_response(status, headers)
-    return [template.render().encode('utf-8')]
+from tennis_scoreboard.app.wsgi import WsgiApp
+from tennis_scoreboard.app.router import Router
+from tennis_scoreboard.views.renderer import Renderer
+from tennis_scoreboard.core.db_config import DBConfig
+from tennis_scoreboard.repositories.unit_of_work import UnitOfWork
+from tennis_scoreboard.services.match_service import MatchService
+from tennis_scoreboard.services.score_service import ScoreService
+from tennis_scoreboard.controllers.match_controller import MatchController
 
 def main() -> None:
-    waitress.serve(wsgiapp, listen='127.0.0.1:8080')
+    engine = create_engine(DBConfig.get_database_url('db_config.toml', 'server_security.toml'))
+    controller = MatchController(
+        MatchService(
+            UnitOfWork(
+                sessionmaker(engine)
+            )
+        ),
+        ScoreService()
+    )
+    router = Router()
+    router.register_route('GET', '/', controller.get_start_page)
+    router.register_route('GET', '/new-match', controller.get_create_match_page)
+    router.register_route('GET', '/matches', controller.get_matches)
+    router.register_route('GET', '/match-score', controller.get_match)
+    renderer = Renderer()
+    app = WsgiApp(router, renderer)
+    waitress.serve(app, listen='127.0.0.1:8080')
+
+main()
