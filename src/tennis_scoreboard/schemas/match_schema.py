@@ -5,6 +5,7 @@ from tennis_scoreboard.models.models import Match
 from tennis_scoreboard.schemas.player_schema import PlayerSchema
 from tennis_scoreboard.schemas.score import Score
 
+
 @dataclass(frozen=True)
 class MatchSchema:
 
