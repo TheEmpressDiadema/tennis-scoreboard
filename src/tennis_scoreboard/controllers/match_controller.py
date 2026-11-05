@@ -8,7 +8,9 @@ from tennis_scoreboard.controllers.structures import HttpRequest, HttpResponse
 from tennis_scoreboard.views.views import (
     MatchScoreView,
     MatchListView,
-    NotFoundView
+    NotFoundView,
+    BaseView,
+    NewMatchView
 )
 
 class MatchController:
@@ -17,6 +19,28 @@ class MatchController:
         self._match_service = match_service
         self._score_service = score_service
 
+    def get_start_page(self, request: HttpRequest) -> HttpResponse:
+        try:
+            return HttpResponse(
+                status=HTTPStatus.OK,
+                view=BaseView()
+            )
+        except:
+            return HttpResponse(
+                status=HTTPStatus.INTERNAL_SERVER_ERROR
+            )
+
+    def get_create_match_page(self, request: HttpRequest) -> HttpResponse:
+        try:
+            return HttpResponse(
+                status=HTTPStatus.OK,
+                view=NewMatchView()
+            )
+        except:
+            return HttpResponse(
+                status=HTTPStatus.INTERNAL_SERVER_ERROR
+            )
+    
     def create_match(self, request: HttpRequest) -> HttpResponse:
         try:
             first_player_name = request.body['first_player_name']
