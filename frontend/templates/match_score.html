@@ -12,18 +12,33 @@
             <th>Action</th>
         </tr>
         <tr>
-            <td>Dmitriy</td>
-            <td>2</td>
-            <td>0</td>
-            <td>0</td>
-            <td><button>Point</button></td>
+            <td>{{ match_schema.first_player.name }}</td>
+            <td>{{ match_schema.score.first_player_score.sets }}</td>
+            <td>{{ match_schema.score.first_player_score.games }}</td>
+            <td>{{ match_schema.score.first_player_score.points }}</td>
+            <td>
+                <form action="/match-score?uuid={{ match_schema.uuid }}" method="post">
+                    <input type="hidden" name="score_to_change" value="first_player_score">
+                    <button type="submit">Point</button>
+                </form>
+            </td>
         </tr>
         <tr>
-            <td>Victor</td>
-            <td>1</td>
-            <td>0</td>
-            <td>0</td>
-            <td><button>Point</button></td>
+            <td>{{ match_schema.second_player.name }}</td>
+            <td>{{ match_schema.score.second_player_score.sets }}</td>
+            <td>{{ match_schema.score.second_player_score.games }}</td>
+            <td>{{ match_schema.score.second_player_score.points }}</td>
+            <td>
+                <form action="/match-score?uuid={{ match_schema.uuid }}" method="post">
+                    <input type="hidden" name="score_to_change" value="second_player_score">
+                    <button type="submit">Point</button>
+                </form>
+            </td>
         </tr>
     </table>
+{% if match_schema.winner_id == match_schema.first_player.id %}
+    <h1>Match winner: {{ match_schema.first_player.name }}</h1>
+{% elif match_schema.winner_id == match_schema.second_player.id %}
+    <h1>Match winner: {{ match_schema.second_player.name }}</h1>
+{% endif %}
 {% endblock %}
