@@ -107,5 +107,4 @@ def router(match_controller: MatchController) -> Router:
     router = Router()
     router.register_route('GET', 'matches', match_controller.get_matches)
     router.register_route('GET', 'match-score', match_controller.get_match)
-    router.register_route('GET', 'new-match', match_controller.get_create_match_page)
     return router
