@@ -17,7 +17,8 @@ class Router:
         self._routes: list[Route] = []
 
     def register_route(self, method: str, pattern: str, handler: Callable) -> None:
-        if not Route in self._routes:
+        route = Route(method, pattern, handler)
+        if not route in self._routes:
             self._routes.append(
                 Route(method.upper(), pattern, handler)
             )
