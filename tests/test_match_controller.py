@@ -11,7 +11,7 @@ class TestMatchController:
     def test_create_match(self, match_controller: MatchController, fill_players) -> None:
         response = match_controller.create_match(
             HttpRequest(
-                method='GET',
+                method='POST',
                 path='/new-match',
                 params={},
                 body={
@@ -25,7 +25,7 @@ class TestMatchController:
     def test_create_match_unknown_players(self, match_controller: MatchController) -> None:
         response = match_controller.create_match(
             HttpRequest(
-                method='GET',
+                method='POST',
                 path='/new-match',
                 params={},
                 body={
@@ -39,7 +39,7 @@ class TestMatchController:
     def test_create_match_without_params(self, match_controller: MatchController) -> None:
         response = match_controller.create_match(
             HttpRequest(
-                method='GET',
+                method='POST',
                 path='/new-match',
                 params={
                 },
