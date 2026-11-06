@@ -1,12 +1,13 @@
 import os
 
 from typing import Any, Callable
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import parse_qs
+from http import HTTPStatus
 from wsgiref.types import InputStream
 
 from tennis_scoreboard.app.router import Router
 from tennis_scoreboard.views.renderer import Renderer
-from tennis_scoreboard.controllers.structures import HttpRequest
+from tennis_scoreboard.controllers.structures import HttpRequest, HttpResponse
 
 
 class WsgiApp:
@@ -30,38 +31,24 @@ class WsgiApp:
     def _parse_query(self, query: str) -> dict[str, Any]:
         return parse_qs(query)
 
-    def _serve_static(self, path: str, start_response: Callable) -> list[bytes]:
-        relative_path = path.removeprefix('/static/')
-        file_path = os.path.realpath(os.path.join('frontend/static/', relative_path))
-
-        if not os.path.isfile(file_path) or not os.path.exists(file_path):
-            start_response('404 Not Found', [('Content-type', 'text/plain')])
-            return [b'Not found']
-
-        content_type = 'text/css'
-        
-        headers = [
-            ('Content-type', content_type)
-        ]
-        start_response('200 OK', headers)
-        with open(file_path, 'rb') as f:
-            return [f.read()]
-
-    def __call__(self, environ: dict[str, str], start_response: Callable) -> list[bytes]:
+    def __call__(self, environ: dict[str, Any], start_response: Callable) -> list[bytes]:
         method = environ['REQUEST_METHOD']
         path = environ.get('PATH_INFO', '/')
-        uri = environ.get('REQUEST_URI', '/')
-        if path.startswith('/static'):
-            return self._serve_static(path, start_response)
-
-        parsed_uri = urlparse(uri)
-        params = parse_qs(parsed_uri.query)
+        query = environ.get('QUERY_STRING', '')
+        body = {}
+        params = self._parse_query(query)
+        if method == 'POST':
+            body = self._get_body(
+                environ['wsgi.input'],
+                environ['CONTENT_LENGTH'],
+                environ['CONTENT_TYPE']
+            )
 
         request = HttpRequest(
             method=method,
             path=path,
             params={k:v[0] for k,v in params.items()},
-            body={}
+            body=body
         )
         handler = self._router.get_handler(method, path)
         response = handler(request)
