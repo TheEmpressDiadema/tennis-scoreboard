@@ -6,13 +6,12 @@
         <th>First player name</th>
         <th>Second player name</th>
         </tr>
+        {% for match in matches %}
         <tr>
-            <td>Victor</td>
-            <td>Dmitriy</td>
+            <td>{{ match.first_player.name }}</td>
+            <td>{{ match.second_player.name }}</td>
+            <td>{{ match.score.first_player_score.sets }}:{{ match.score.second_player_score.sets }}</td>
         </tr>
-        <tr>
-            <td>Victor</td>
-            <td>Egor</td>
-        </tr>
+        {% endfor %}
     </table>
 {% endblock %}
