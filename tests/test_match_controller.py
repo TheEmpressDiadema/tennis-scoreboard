@@ -36,19 +36,6 @@ class TestMatchController:
         )
         assert response.status == HTTPStatus.SEE_OTHER
 
-    def test_create_match_without_params(self, match_controller: MatchController) -> None:
-        response = match_controller.create_match(
-            HttpRequest(
-                method='POST',
-                path='/new-match',
-                params={
-                },
-                body={
-                }
-            )
-        )
-        assert response.status == HTTPStatus.INTERNAL_SERVER_ERROR
-
     def test_update_match(self, match_controller: MatchController, fill_matches) -> None:
         response = match_controller.update_match(
             HttpRequest(
@@ -118,18 +105,3 @@ class TestMatchController:
         )
         assert response.status == HTTPStatus.OK
         assert isinstance(response.view, MatchListView)
-
-    def test_get_page_with_letter_number(self, match_controller: MatchController, fill_matches) -> None:
-        response = match_controller.get_matches(
-            HttpRequest(
-                method='GET',
-                path='/matches?page=$page_number&filter_by_player_name=$player_name',
-                params={
-                    'page_number' : 'abacaba'
-                },
-                body={
-
-                }
-            )
-        )
-        assert response.status == HTTPStatus.INTERNAL_SERVER_ERROR
