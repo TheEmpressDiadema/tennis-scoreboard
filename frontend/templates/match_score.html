@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Страница матча{% endblock %}
+{% block title %}Match page{% endblock %}
 
 {% block content %}
     <table>
@@ -17,10 +17,12 @@
             <td>{{ match_schema.score.first_player_score.games }}</td>
             <td>{{ match_schema.score.first_player_score.points }}</td>
             <td>
+                {% if not match_schema.score.winner_id %}
                 <form action="/match-score?uuid={{ match_schema.uuid }}" method="post">
                     <input type="hidden" name="score_to_change" value="first_player_score">
                     <button type="submit">Point</button>
                 </form>
+                {% endif %}
             </td>
         </tr>
         <tr>
@@ -29,10 +31,12 @@
             <td>{{ match_schema.score.second_player_score.games }}</td>
             <td>{{ match_schema.score.second_player_score.points }}</td>
             <td>
+                {% if not match_schema.score.winner_id %}
                 <form action="/match-score?uuid={{ match_schema.uuid }}" method="post">
                     <input type="hidden" name="score_to_change" value="second_player_score">
                     <button type="submit">Point</button>
                 </form>
+                {% endif %}
             </td>
         </tr>
     </table>
