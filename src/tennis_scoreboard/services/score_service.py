@@ -1,7 +1,7 @@
 from dataclasses import asdict
 from typing import Any
 
-from tennis_scoreboard.schemas.score import Score
+from tennis_scoreboard.schemas.score import Score, PlayerScore
 from tennis_scoreboard.errors.score_errors import MatchEnded
 
 
@@ -96,4 +96,12 @@ class ScoreService:
         if game_ended:
             self._finish_game(score_dict, winner_score, loser_score)
 
-        return Score.from_dict(score_dict)
+        score = Score.from_dict(score_dict)
+
+        if self._check_ended(score):
+            score = Score(
+                PlayerScore(sets=score.first_player_score.sets),
+                PlayerScore(sets=score.second_player_score.sets)
+            )
+
+        return score
