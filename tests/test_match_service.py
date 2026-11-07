@@ -1,7 +1,5 @@
 import pytest
 
-from uuid import UUID
-
 from tennis_scoreboard.schemas.score import Score, PlayerScore
 from tennis_scoreboard.services.match_service import MatchService
 from tennis_scoreboard.errors.db_errors import MatchNotFoundError, PlayerNotFoundError

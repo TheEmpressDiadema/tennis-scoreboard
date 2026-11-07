@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from tennis_scoreboard.models.models import Match, Player
 from tennis_scoreboard.schemas.score import Score, PlayerScore
-from tennis_scoreboard.errors.db_errors import PlayerNotFoundError, MatchNotFoundError
+from tennis_scoreboard.errors.db_errors import MatchNotFoundError
 from tennis_scoreboard.repositories.match_repository import MatchSqlRepository
 
 
