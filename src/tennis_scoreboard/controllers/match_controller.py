@@ -3,12 +3,15 @@ from http import HTTPStatus
 from tennis_scoreboard.errors.score_errors import MatchEnded
 from tennis_scoreboard.services.match_service import MatchService
 from tennis_scoreboard.services.score_service import ScoreService
-from tennis_scoreboard.errors.db_errors import MatchNotFoundError
+from tennis_scoreboard.errors.validation_errors import ValidationError
+from tennis_scoreboard.errors.db_errors import MatchNotFoundError, PlayerNotFoundError
 from tennis_scoreboard.controllers.structures import HttpRequest, HttpResponse
+
 from tennis_scoreboard.views.views import (
     MatchScoreView,
     MatchListView,
     NotFoundView,
+    NewMatchView
 )
 
 
@@ -20,14 +23,15 @@ class MatchController:
     
     def create_match(self, request: HttpRequest) -> HttpResponse:
         try:
-            first_player_name = request.body['first_player_name']
-            second_player_name = request.body['second_player_name']
+            first_player_name = request.body.get('first_player_name', '')
+            second_player_name = request.body.get('second_player_name', '')
             schema = self._match_service.create_match(first_player_name, second_player_name)
             location = '/match-score?uuid=' + schema.uuid
             return HttpResponse.redirect(location)
-        except:
+        except ValidationError as er:
             return HttpResponse(
-                status=HTTPStatus.INTERNAL_SERVER_ERROR
+                status=HTTPStatus.BAD_REQUEST,
+                view=NewMatchView(error=str(er))
             )
 
     def update_match(self, request: HttpRequest) -> HttpResponse:
@@ -52,10 +56,6 @@ class MatchController:
                 status=HTTPStatus.IM_A_TEAPOT,
                 view=MatchScoreView(match_schema=schema)
             )
-        except:
-            return HttpResponse(
-                status=HTTPStatus.INTERNAL_SERVER_ERROR
-            )
 
     def get_match(self, request: HttpRequest) -> HttpResponse:
         try:
@@ -70,14 +70,10 @@ class MatchController:
                 status=HTTPStatus.NOT_FOUND,
                 view=NotFoundView()
             )
-        except:
-            return HttpResponse(
-                status=HTTPStatus.INTERNAL_SERVER_ERROR
-            )
 
     def get_matches(self, request: HttpRequest) -> HttpResponse:
         try:
-            player_name = request.body.get('filter_by_player_name')
+            player_name = request.params.get('player_name')
             page = request.params.get('page_number')
 
             if page is None:
@@ -94,7 +90,8 @@ class MatchController:
                 status=HTTPStatus.OK,
                 view=MatchListView(matches=schemas)
             )
-        except:
+        except PlayerNotFoundError:
             return HttpResponse(
-                status=HTTPStatus.INTERNAL_SERVER_ERROR
+                status=HTTPStatus.OK,
+                view=MatchListView()
             )
