@@ -1,8 +1,15 @@
 {% extends "base.html" %}
 
-{% block title %}Create match{% endblock %}
+{% block title %}Create match page{% endblock %}
 
 {% block content %}
+    {% if error %}
+    <div>
+    <p>Couldn’t start the match</p>
+    <p>{{ error }}</p>
+    </div>
+    {% endif %}
+
     <form action="/new-match" method="post">
         <input type="text" name="first_player_name" value="{{ first_player_name }}"/>
         <input type="text" name="second_player_name" value="{{ first_player_name }}"/>
