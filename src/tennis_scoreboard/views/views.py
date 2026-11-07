@@ -11,13 +11,14 @@ class BaseView:
     template: str = 'index.html'
 
     def context(self) -> dict[str, Any]:
-        return asdict(self)
+        return {k : v for k,v in vars(self).items() if k != 'template'}
 
 @dataclass(frozen=True)
 class NewMatchView(BaseView):
 
     title: str = 'Create new match'
     template: str = 'new_match.html'
+    error: str | None = None
 
 @dataclass(frozen=True)
 class MatchListView(BaseView):
