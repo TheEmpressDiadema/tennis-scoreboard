@@ -3,46 +3,51 @@
 {% block title %}Match page{% endblock %}
 
 {% block content %}
-    <table>
-        <tr>
-            <th>Player name</th>
-            <th>Sets</th>
-            <th>Games</th>
-            <th>Points</th>
-            <th>Action</th>
-        </tr>
-        <tr>
-            <td>{{ match_schema.first_player.name }}</td>
-            <td>{{ match_schema.score.first_player_score.sets }}</td>
-            <td>{{ match_schema.score.first_player_score.games }}</td>
-            <td>{{ match_schema.score.first_player_score.points }}</td>
-            <td>
-                {% if not match_schema.score.winner_id %}
-                <form action="/match-score?uuid={{ match_schema.uuid }}" method="post">
-                    <input type="hidden" name="score_to_change" value="first_player_score">
-                    <button type="submit">Point</button>
-                </form>
-                {% endif %}
-            </td>
-        </tr>
-        <tr>
-            <td>{{ match_schema.second_player.name }}</td>
-            <td>{{ match_schema.score.second_player_score.sets }}</td>
-            <td>{{ match_schema.score.second_player_score.games }}</td>
-            <td>{{ match_schema.score.second_player_score.points }}</td>
-            <td>
-                {% if not match_schema.score.winner_id %}
-                <form action="/match-score?uuid={{ match_schema.uuid }}" method="post">
-                    <input type="hidden" name="score_to_change" value="second_player_score">
-                    <button type="submit">Point</button>
-                </form>
-                {% endif %}
-            </td>
-        </tr>
-    </table>
-{% if match_schema.winner_id == match_schema.first_player.id %}
-    <h1>Match winner: {{ match_schema.first_player.name }}</h1>
-{% elif match_schema.winner_id == match_schema.second_player.id %}
-    <h1>Match winner: {{ match_schema.second_player.name }}</h1>
-{% endif %}
+<main class="page page--score">
+    <div class="card table-card">
+        <table class="score-table">
+            <tr>
+                <th>Player name</th>
+                <th>Sets</th>
+                <th>Games</th>
+                <th>Points</th>
+                <th>Action</th>
+            </tr>
+            <tr>
+                <td>{{ match_schema.first_player.name }}</td>
+                <td>{{ match_schema.score.first_player_score.sets }}</td>
+                <td>{{ match_schema.score.first_player_score.games }}</td>
+                <td>{{ match_schema.score.first_player_score.points }}</td>
+                <td>
+                    {% if not match_schema.score.winner_id %}
+                    <form action="/match-score?uuid={{ match_schema.uuid }}" method="post">
+                        <input type="hidden" name="score_to_change" value="first_player_score">
+                        <button class="button button--accent button--point" type="submit">Point</button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td>{{ match_schema.second_player.name }}</td>
+                <td>{{ match_schema.score.second_player_score.sets }}</td>
+                <td>{{ match_schema.score.second_player_score.games }}</td>
+                <td>{{ match_schema.score.second_player_score.points }}</td>
+                <td>
+                    {% if not match_schema.score.winner_id %}
+                    <form action="/match-score?uuid={{ match_schema.uuid }}" method="post">
+                        <input type="hidden" name="score_to_change" value="second_player_score">
+                        <button class="button button--accent button--point" type="submit">Point</button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    {% if match_schema.winner_id == match_schema.first_player.id %}
+    <h1 class="match-winner">Match winner: {{ match_schema.first_player.name }}</h1>
+    {% elif match_schema.winner_id == match_schema.second_player.id %}
+    <h1 class="match-winner">Match winner: {{ match_schema.second_player.name }}</h1>
+    {% endif %}
+</main>
 {% endblock %}

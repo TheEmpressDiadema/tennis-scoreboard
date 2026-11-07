@@ -3,16 +3,31 @@
 {% block title %}Create match page{% endblock %}
 
 {% block content %}
+<main class="page page--form">
     {% if error %}
-    <div>
-    <p>Couldn’t start the match</p>
-    <p>{{ error }}</p>
+    <div class="alert" role="alert">
+        <p class="alert__title">Couldn’t start the match</p>
+        <p class="alert__text">{{ error }}</p>
     </div>
     {% endif %}
 
-    <form action="/new-match" method="post">
-        <input type="text" name="first_player_name" value="{{ first_player_name }}"/>
-        <input type="text" name="second_player_name" value="{{ first_player_name }}"/>
-        <button type="submit">Create match</button>
-    </form>
+    <div class="card form-card">
+        <header class="page-head">
+            <h1>Новый матч</h1>
+            <p>Введите имена игроков и начните партию.</p>
+        </header>
+
+        <form class="create-form" action="/new-match" method="post">
+            <div class="field">
+                <label for="first_player_name">Первый игрок</label>
+                <input class="input" id="first_player_name" type="text" name="first_player_name" value="{{ first_player_name }}" placeholder="Иван">
+            </div>
+            <div class="field">
+                <label for="second_player_name">Второй игрок</label>
+                <input class="input" id="second_player_name" type="text" name="second_player_name" value="{{ first_player_name }}" placeholder="Пётр">
+            </div>
+            <button class="button button--accent" type="submit">Create match</button>
+        </form>
+    </div>
+</main>
 {% endblock %}

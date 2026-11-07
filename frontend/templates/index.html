@@ -1,6 +1,38 @@
 {% extends "base.html"%}
 {% block title %}Tennis Scoreboard {% endblock %}
 {% block content %}
-    <a href="/new-match">Создать новый матч</a>
-    <a href="/matches">Список завершенных матчей</a>
+<main class="page">
+    <section class="hero">
+        <div class="hero__content">
+            <p class="hero__eyebrow">Tennis Scoreboard</p>
+            <h1 class="hero__title">Считайте счёт матча поинт за поинтом</h1>
+            <p class="hero__subtitle">Создайте матч, отмечайте выигранные розыгрыши, а когда определится победитель — матч автоматически сохранится в историю завершённых.</p>
+            <div class="hero__actions">
+                <a class="button button--primary" href="/new-match">Создать новый матч</a>
+                <a class="button button--ghost" href="/matches">Завершённые матчи</a>
+            </div>
+        </div>
+        <div class="hero__ball-wrap" aria-hidden="true">
+            <div class="ball"></div>
+        </div>
+    </section>
+
+    <section class="features">
+        <article class="card feature-card">
+            <div class="feature-card__icon">🎾</div>
+            <h3>Живой счёт</h3>
+            <p>Поинты, геймы и сеты обновляются сразу после каждого розыгрыша.</p>
+        </article>
+        <article class="card feature-card">
+            <div class="feature-card__icon">🏆</div>
+            <h3>Определение победителя</h3>
+            <p>Когда матч сыгран, победитель фиксируется и результат сохраняется.</p>
+        </article>
+        <article class="card feature-card">
+            <div class="feature-card__icon">📊</div>
+            <h3>История матчей</h3>
+            <p>Завершённые матчи можно отфильтровать по имени игрока.</p>
+        </article>
+    </section>
+</main>
 {% endblock %}

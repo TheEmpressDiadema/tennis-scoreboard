@@ -3,5 +3,12 @@
 {% block title %}Not Found{% endblock %}
 
 {% block content %}
-<h1 class="not-found">Здесь ничо, 404</h1>
+<main class="page">
+    <section class="not-found">
+        <div class="ball ball--small" aria-hidden="true"></div>
+        <h1 class="not-found__title">Здесь ничо, 404</h1>
+        <p class="not-found__text">Мяч ушёл в аут — такой страницы на корте нет.</p>
+        <a class="button button--primary" href="/">На главную</a>
+    </section>
+</main>
 {% endblock %}

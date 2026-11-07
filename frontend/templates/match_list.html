@@ -1,21 +1,31 @@
 {%  extends "base.html" %}
 {% block title %}Ended matches list{% endblock %}
 {% block content %}
-    <form action="/matches" method="get">
-        <input type="search" name="player_name" value="{{ player_name }}" placeholder="Player name">
-        <button type="submit">Filter</button>
+<main class="page">
+    <header class="page-head">
+        <h1>Завершённые матчи</h1>
+        <p>История сыгранных матчей. Используйте фильтр, чтобы найти нужного игрока.</p>
+    </header>
+
+    <form class="filter" action="/matches" method="get">
+        <input class="input" type="search" name="player_name" value="{{ player_name }}" placeholder="Player name">
+        <button class="button button--primary" type="submit">Filter</button>
     </form>
-    <table>
-        <tr>
-        <th>First player name</th>
-        <th>Second player name</th>
-        </tr>
-        {% for match in matches %}
-        <tr>
-            <td>{{ match.first_player.name }}</td>
-            <td>{{ match.second_player.name }}</td>
-            <td>{{ match.score.first_player_score.sets }}:{{ match.score.second_player_score.sets }}</td>
-        </tr>
-        {% endfor %}
-    </table>
+
+    <div class="card table-card">
+        <table class="matches-table">
+            <tr>
+            <th>First player name</th>
+            <th>Second player name</th>
+            </tr>
+            {% for match in matches %}
+            <tr>
+                <td>{{ match.first_player.name }}</td>
+                <td>{{ match.second_player.name }}</td>
+                <td>{{ match.score.first_player_score.sets }}:{{ match.score.second_player_score.sets }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</main>
 {% endblock %}

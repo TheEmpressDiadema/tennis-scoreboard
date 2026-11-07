@@ -7,10 +7,24 @@
     <title>{% block title %}{% endblock %}</title>
 </head>
 <body>
-<header>
-    <a href="/"><h1>Tennis Scoreboard by EmpressDiadema</h1></a>
+<header class="header-outer">
+    <div class="header-inner responsive-wrapper">
+        <div class="header-logo">
+            <a href="/"><h2>Tennis Scoreboard by EmpressDiadema</h2></a>
+        </div>
+        <nav class="header-navigation">
+            <a href="/new-match">Создать новый матч</a>
+            <a href="/matches">Список завершенных матчей</a>
+            <button>Menu</button>
+        </nav>
+    </div>
 </header>
 {% block content %} 
 {% endblock %}
+<footer class="footer">
+    <div class="responsive-wrapper">
+        <p class="footer__text">Tennis Scoreboard by EmpressDiadema</p>
+    </div>
+</footer>
 </body>
 </html>
