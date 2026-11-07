@@ -59,7 +59,7 @@ class ScoreService:
                 and loser_score['games'] == self.GAMES_TO_WIN
             )
 
-    def _check_ended(self, score: Score) -> bool:
+    def _check_match_ended(self, score: Score) -> bool:
         return any(
             [
                 score.first_player_score.sets == 2, 
@@ -69,7 +69,7 @@ class ScoreService:
 
     def award_point(self, score: Score, score_to_change: str) -> Score:
 
-        if self._check_ended(score):
+        if self._check_match_ended(score):
             raise MatchEnded
 
         score_dict = asdict(score)
@@ -98,7 +98,7 @@ class ScoreService:
 
         score = Score.from_dict(score_dict)
 
-        if self._check_ended(score):
+        if self._check_match_ended(score):
             score = Score(
                 PlayerScore(sets=score.first_player_score.sets),
                 PlayerScore(sets=score.second_player_score.sets)
