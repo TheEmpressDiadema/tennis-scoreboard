@@ -1,12 +1,27 @@
 from uuid import UUID, uuid4
 from dataclasses import asdict
 from typing import Annotated
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+
 from sqlalchemy import (
     String, ForeignKey, Uuid, Dialect, 
     JSON, CheckConstraint, TypeDecorator
 )
+from sqlalchemy.orm import (
+    DeclarativeBase,
+    Mapped, 
+    mapped_column, 
+    relationship, 
+    validates
+)
+
 from tennis_scoreboard.schemas.score import Score
+from tennis_scoreboard.errors.validation_errors import (
+    TooShortNameError,
+    TooLongNameError,
+    SymbolCountError,
+    UndefinedSymbolError,
+    SamePlayersInputError
+)
 
 
 intpk = Annotated[int, mapped_column(primary_key=True)]
@@ -49,6 +64,30 @@ class Player(BaseModel):
     repr_count = 2
     repr_cols = ["id", "name"]
 
+    def _validate_symbol_count(self, value: str, symbol: str) -> None:
+        if value.count(symbol) > 2:
+            symbol = '" "' if symbol == ' ' else symbol 
+            raise SymbolCountError(f'Player name should have less then 3 {symbol}')
+
+    def _validate_unexpected(self, value: str) -> None:
+        unexpected_symbols = ".,/\\'#!\"$%^&*()0123456789+"
+        for symbol in value:
+            if symbol in unexpected_symbols:
+                raise UndefinedSymbolError(f"Player name should not have symbols like '{unexpected_symbols}'")
+
+    def _validate_length(self, value: str) -> None:
+        if len(value) < 3:
+            raise TooShortNameError('Player name length should be from 3 to 30 symbols')    
+        if len(value) > 30:
+            raise TooLongNameError('Player name length should be from 3 to 30 symbols')
+
+    @validates('name')
+    def validate_name(self, key: str, value: str):  
+        self._validate_length(value)
+        self._validate_unexpected(value)
+        self._validate_symbol_count(value, '-')
+        self._validate_symbol_count(value, ' ')
+        return value
 
 class Match(BaseModel):
 
@@ -81,6 +120,10 @@ class Match(BaseModel):
     repr_count = 6
     repr_cols = ['id', 'uuid', 'first_player_id', 'second_player_id', 'winner_id', 'score']
 
-    __table_args__ = (
-        CheckConstraint("first_player_id != second_player_id", name="check_fk_equal"),
-    )
+    @validates('second_player_id')
+    def validate_equal_players(self, key: str, value: int) -> int:
+        
+        if value == self.first_player_id:
+            raise SamePlayersInputError("Match contenders can't have same names")
+        
+        return value
