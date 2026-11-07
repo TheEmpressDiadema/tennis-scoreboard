@@ -41,4 +41,4 @@ def build_app():
 
 def main() -> None:
     app = build_app()
-    waitress.serve(app, listen='127.0.0.1:8080', threads=1)
+    waitress.serve(app, host='127.0.0.1', port=8080, threads=1)
