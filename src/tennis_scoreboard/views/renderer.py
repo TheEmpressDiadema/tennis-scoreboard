@@ -17,7 +17,7 @@ class Renderer:
 
     def render_css(self, path: str) -> bytes:
         filename = path.removeprefix('/static/')
-        strict_path = os.path.join(self._STATIC_DIR, filename)
+        file_path = os.path.join(self._STATIC_DIR, filename)
 
-        with open(strict_path, 'r') as css:
+        with open(file_path, 'r', encoding='utf-8') as css:
             return css.read().encode()
