@@ -26,6 +26,9 @@ class MatchListView(BaseView):
     title: str = 'Matches'
     template: str = 'match_list.html'
     matches: list[MatchSchema] = field(default_factory=list)
+    total_pages: int = 1
+    page_number: int = 1
+    player_name: str = ''
 
 @dataclass(frozen=True)
 class MatchScoreView(BaseView):
