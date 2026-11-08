@@ -63,7 +63,7 @@ class ScoreService:
         return any(
             [
                 score.first_player_score.sets == 2, 
-                score.first_player_score.sets == 2
+                score.second_player_score.sets == 2
             ]
         )
 

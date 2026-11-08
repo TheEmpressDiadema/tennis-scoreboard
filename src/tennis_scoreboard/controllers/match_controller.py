@@ -52,7 +52,7 @@ class MatchController:
             )
         except MatchEnded:
             return HttpResponse(
-                status=HTTPStatus.IM_A_TEAPOT,
+                status=HTTPStatus.BAD_REQUEST,
                 view=MatchScoreView(match_schema=schema)
             )
 
