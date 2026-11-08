@@ -1,5 +1,6 @@
 import pytest
 
+from tennis_scoreboard.errors.score_errors import MatchEnded
 from tennis_scoreboard.schemas.score import Score, PlayerScore
 from tennis_scoreboard.services.score_service import ScoreService
 
@@ -118,3 +119,23 @@ class TestScoreService:
     def test_run_overtime(self, score: Score, score_to_change: str, expected: Score) -> None:
         result = self._score_service.award_point(score, score_to_change)
         assert result == expected
+
+    @pytest.mark.parametrize(
+        "score, score_to_change",
+        [
+            (
+                Score(PlayerScore('0', 2, 0), PlayerScore('0', 1, 0)),
+                'second_player_score'
+            ),
+            (
+                Score(PlayerScore('0', 2, 0), PlayerScore('0', 1, 0)),
+                'first_player_score'
+            )
+        ]
+    )
+    def test_update_ended_match(self, score: Score, score_to_change: str) -> None:
+        with pytest.raises(MatchEnded):
+            result = self._score_service.award_point(
+                score,
+                score_to_change
+            )
