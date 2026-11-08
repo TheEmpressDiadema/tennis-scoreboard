@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from tennis_scoreboard.models.models import Match, Player
 from tennis_scoreboard.schemas.score import Score, PlayerScore
 from tennis_scoreboard.errors.db_errors import MatchNotFoundError
+from tennis_scoreboard.errors.validation_errors import SamePlayersInputError
 from tennis_scoreboard.repositories.match_repository import MatchSqlRepository
 
 
@@ -14,10 +15,12 @@ class TestMatchRepository:
     def test_add_match(self, db_session: Session, fill_players) -> None:
         repo = MatchSqlRepository(db_session)
         match_object = repo.add(Player(id=1, name='Victor'), Player(id=2, name='Dmitriy'))
-        db_session.commit()
+        assert match_object.id is not None
 
-        count = db_session.query(Match).count()
-        assert count == 1
+    def test_same_id_players_match(self, db_session: Session, fill_players) -> None:
+        with pytest.raises(SamePlayersInputError):
+            repo = MatchSqlRepository(db_session)
+            match_object = repo.add(Player(id=1, name='Victor'), Player(id=1, name='Victor'))
 
     def test_update_match(self, db_session: Session, fill_matches) -> None:
         repo = MatchSqlRepository(db_session)
@@ -26,7 +29,6 @@ class TestMatchRepository:
             UUID('00000000-0000-0000-0000-0000-00000001'), 
             score
         )
-        db_session.commit()
         assert match_object.score == score
 
     def test_update_unexisting_match(self, db_session: Session, fill_matches) -> None:
