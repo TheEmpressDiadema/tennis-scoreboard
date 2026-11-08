@@ -1,6 +1,7 @@
 from typing import Any, Self
 from dataclasses import dataclass
 
+
 @dataclass(frozen=True)
 class PlayerScore:
     points: str = '0'
