@@ -6,7 +6,7 @@ from tennis_scoreboard.schemas.player_schema import PlayerSchema
 from tennis_scoreboard.schemas.score import Score
 
 
-@dataclass
+@dataclass(frozen=True)
 class MatchSchema:
 
     id: int 

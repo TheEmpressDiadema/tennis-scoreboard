@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from tennis_scoreboard.models.models import Player
 
 
-@dataclass
+@dataclass(frozen=True)
 class PlayerSchema:
 
     name: str
