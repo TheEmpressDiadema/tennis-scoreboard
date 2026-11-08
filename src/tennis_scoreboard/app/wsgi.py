@@ -11,9 +11,26 @@ from tennis_scoreboard.controllers.structures import HttpRequest, HttpResponse
 
 class WsgiApp:
 
+    _STATIC_PREFIX = '/static/'
+
     def __init__(self, router: Router, renderer: Renderer):
         self._router = router
         self._renderer = renderer
+
+    def _serve_static(self, path: str) -> HttpResponse:
+        try:
+            body = self._renderer.render_css(path)
+        except (FileNotFoundError, IsADirectoryError):
+            return HttpResponse(status=HTTPStatus.NOT_FOUND, view=NotFoundView())
+
+        return HttpResponse(
+            status=HTTPStatus.OK,
+            headers=[
+                ('Content-Type', 'text/css; charset=utf-8'),
+                ('Content-Length', str(len(body))),
+            ],
+            body=body,
+        )
 
     def _parse_body(self, wsgi_input: InputStream, content_length: str, content_type: str) -> dict[str, Any]:
         length = int(content_length)
@@ -45,27 +62,29 @@ class WsgiApp:
             body=body
         )
 
-    def _get_content(self, path: str, response: HttpResponse) -> list[bytes]:
-        if response.view is not None:
-            return [self._renderer.render(response.view)]
-        else:
-            if path.startswith('/static/'):
-                return [self._renderer.render_css(path)]
-            else:
-                return [b'']
+    def _get_response(self, request: HttpRequest) -> HttpResponse:
+        if request.path.startswith(self._STATIC_PREFIX):
+            return self._serve_static(request.path)
+
+        try:
+            handler = self._router.get_handler(request.method, request.path)
+        except LookupError:
+            return HttpResponse(status=HTTPStatus.NOT_FOUND, view=NotFoundView())
+
+        return handler(request)
 
     def __call__(self, environ: dict[str, Any], start_response: Callable) -> list[bytes]:
-        try:
-            request = self._parse_request(environ)
-            handler = self._router.get_handler(request.method, request.path)
-            response = handler(request)
-        except LookupError:
-            response = HttpResponse(
-                status=HTTPStatus.NOT_FOUND,
-                view=NotFoundView()
-            )
-        start_response(
-            f'{response.status.value} {response.status.phrase}', 
-            response.headers
+        request = self._parse_request(environ)
+        response = self._get_response(request)
+
+        body = (
+            self._renderer.render(response.view)
+            if response.view is not None
+            else response.body
         )
-        return self._get_content(request.path, response)
+
+        start_response(
+            f'{response.status.value} {response.status.phrase}',
+            response.headers,
+        )
+        return [body]
