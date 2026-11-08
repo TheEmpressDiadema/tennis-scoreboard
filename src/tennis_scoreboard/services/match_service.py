@@ -1,3 +1,5 @@
+import math
+
 from uuid import UUID
 
 from tennis_scoreboard.schemas.score import Score
@@ -58,22 +60,23 @@ class MatchService:
                 session.match_repository.get_by_uuid(UUID(uuid))
             )
 
-    def get_player_ended_matches(self, name: str, page: int = 1, count: int = 5) -> list[MatchSchema]:
+    def get_ended_matches_with_page_count(self, 
+                                          player_name: str = '', 
+                                          page: int = 1, 
+                                          count_per_page: int = 5
+                                        ) -> tuple[list[MatchSchema], int]:
         with self._unit_of_work.start() as session:
-            player = session.player_repository.get_by_name(name)
-            matches = session.match_repository.get_ended_player_matches(player.id)
 
-            lower_bound = count*(page - 1)
-            upper_bound = min(page * count, len(matches))
+            if player_name == '':
+                matches = session.match_repository.get_ended_matches()
+            else:
+                player = session.player_repository.get_by_name(player_name)
+                matches = session.match_repository.get_ended_player_matches(player.id)
+
+            lower_bound = count_per_page*(page - 1)
+            upper_bound = min(page * count_per_page, len(matches))
 
             schemas = [MatchSchema.from_sqlalchemy_model(matches[i]) for i in range(lower_bound, upper_bound)]
-            return schemas
+            page_count = math.ceil(len(matches) / count_per_page)
 
-    def get_ended_matches(self, page: int = 1, count: int = 5) -> list[MatchSchema]:
-        with self._unit_of_work.start() as session:
-            matches = session.match_repository.get_ended_matches()
-
-            lower_bound = count*(page - 1)
-            upper_bound = min(page * count, len(matches))
-
-            return [MatchSchema.from_sqlalchemy_model(matches[i]) for i in range(lower_bound, upper_bound)]
+            return schemas, page_count 
