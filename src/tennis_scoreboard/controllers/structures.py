@@ -19,6 +19,7 @@ class HttpResponse:
     view: BaseView | None = field(default=None)
     status: HTTPStatus = field(default=HTTPStatus.OK)
     headers: list[tuple[str, str]] = field(default_factory = lambda : [('Content-type', 'text/html')])
+    body: bytes = b''
 
     @classmethod
     def redirect(cls, location: str) -> Self:
