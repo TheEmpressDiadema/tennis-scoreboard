@@ -6,7 +6,7 @@ from tennis_scoreboard.controllers.structures import HttpRequest, HttpResponse
 
 class StaticHtmlController:
 
-    def get_start_page(self, request: HttpRequest) -> HttpResponse:
+    def get_main_page(self, request: HttpRequest) -> HttpResponse:
         return HttpResponse(
             status=HTTPStatus.OK,
             view=BaseView()
