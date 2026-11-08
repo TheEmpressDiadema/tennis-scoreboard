@@ -3,7 +3,8 @@ from dataclasses import dataclass, field
 
 from tennis_scoreboard.models.models import Player
 
-@dataclass(frozen=True)
+
+@dataclass
 class PlayerSchema:
 
     name: str
