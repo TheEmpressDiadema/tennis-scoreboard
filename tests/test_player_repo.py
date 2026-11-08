@@ -5,16 +5,39 @@ from sqlalchemy.orm import Session
 from tennis_scoreboard.models.models import Player
 from tennis_scoreboard.repositories.player_repository import PlayerSqlRepository
 from tennis_scoreboard.errors.db_errors import PlayerExistsError, PlayerNotFoundError
+from tennis_scoreboard.errors.validation_errors import (
+    TooLongNameError,
+    TooShortNameError,
+    UndefinedSymbolError,
+    SymbolCountError
+)
 
 class TestPlayerRepository:
 
     def test_add_player(self, db_session: Session) -> None:
         repo = PlayerSqlRepository(db_session)
-        repo.add('Victor')
-        db_session.commit()
+        player = repo.add('Victor')
+        assert player.id is not None
 
-        count = db_session.query(Player).count()
-        assert count == 1
+    def test_add_shortnamed_player(self, db_session: Session) -> None:
+        with pytest.raises(TooShortNameError):
+            repo = PlayerSqlRepository(db_session)
+            repo.add('ab')
+
+    def test_add_longnamed_player(self, db_session: Session) -> None:
+        with pytest.raises(TooLongNameError):
+            repo = PlayerSqlRepository(db_session)
+            repo.add('abcdefghijklmnopqrstuvwxyzqweaasd')
+
+    def test_add_too_much_spaces_player(self, db_session: Session) -> None:
+        with pytest.raises(SymbolCountError):
+            repo = PlayerSqlRepository(db_session)
+            repo.add('a b c d')
+
+    def test_add_undefined_symbol_player(self, db_session: Session) -> None:
+        with pytest.raises(UndefinedSymbolError):
+            repo = PlayerSqlRepository(db_session)
+            repo.add('+ass')
 
     def test_add_existing_player(self, db_session: Session, fill_players) -> None:
         repo = PlayerSqlRepository(db_session)
