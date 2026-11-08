@@ -1,10 +1,10 @@
-import pytest
 
 from http import HTTPStatus
 
-from tennis_scoreboard.controllers.structures import HttpRequest
 from tennis_scoreboard.controllers.match_controller import MatchController
+from tennis_scoreboard.controllers.structures import HttpRequest
 from tennis_scoreboard.views.views import MatchListView
+
 
 class TestMatchController:
 

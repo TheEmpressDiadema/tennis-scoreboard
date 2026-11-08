@@ -1,16 +1,15 @@
 import pytest
-
 from sqlalchemy.orm import Session
 
-from tennis_scoreboard.models.models import Player
-from tennis_scoreboard.repositories.player_repository import PlayerSqlRepository
 from tennis_scoreboard.errors.db_errors import PlayerExistsError, PlayerNotFoundError
 from tennis_scoreboard.errors.validation_errors import (
+    SymbolCountError,
     TooLongNameError,
     TooShortNameError,
     UndefinedSymbolError,
-    SymbolCountError
 )
+from tennis_scoreboard.repositories.player_repository import PlayerSqlRepository
+
 
 class TestPlayerRepository:
 
@@ -42,7 +41,7 @@ class TestPlayerRepository:
     def test_add_existing_player(self, db_session: Session, fill_players) -> None:
         repo = PlayerSqlRepository(db_session)
         with pytest.raises(PlayerExistsError):
-            result = repo.add('Victor')
+            repo.add('Victor')
             db_session.commit()
 
     def test_get_player_by_id(self, db_session: Session, fill_players) -> None:
@@ -53,7 +52,7 @@ class TestPlayerRepository:
     def test_get_unexisting_player_by_id(self, db_session: Session) -> None:
         repo = PlayerSqlRepository(db_session)
         with pytest.raises(PlayerNotFoundError):
-            player = repo.get_by_id(1)
+            repo.get_by_id(1)
 
     def test_get_player_by_name(self, db_session: Session, fill_players) -> None:
         repo = PlayerSqlRepository(db_session)
@@ -63,4 +62,4 @@ class TestPlayerRepository:
     def test_get_unexisting_player_by_name(self, db_session: Session) -> None:
         repo = PlayerSqlRepository(db_session)
         with pytest.raises(PlayerNotFoundError):
-            player = repo.get_by_id(1)
+            repo.get_by_id(1)

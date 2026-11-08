@@ -1,28 +1,31 @@
-from uuid import UUID, uuid4
 from dataclasses import asdict
 from typing import Annotated
+from uuid import UUID, uuid4
 
 from sqlalchemy import (
-    String, ForeignKey, Uuid, Dialect, 
-    JSON, CheckConstraint, TypeDecorator
+    JSON,
+    Dialect,
+    ForeignKey,
+    String,
+    TypeDecorator,
+    Uuid,
 )
 from sqlalchemy.orm import (
     DeclarativeBase,
-    Mapped, 
-    mapped_column, 
-    relationship, 
-    validates
+    Mapped,
+    mapped_column,
+    relationship,
+    validates,
 )
 
-from tennis_scoreboard.schemas.score import Score
 from tennis_scoreboard.errors.validation_errors import (
-    TooShortNameError,
-    TooLongNameError,
+    SamePlayersInputError,
     SymbolCountError,
+    TooLongNameError,
+    TooShortNameError,
     UndefinedSymbolError,
-    SamePlayersInputError
 )
-
+from tennis_scoreboard.schemas.score import Score
 
 intpk = Annotated[int, mapped_column(primary_key=True)]
 

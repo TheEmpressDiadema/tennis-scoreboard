@@ -1,7 +1,7 @@
 from http import HTTPStatus
 
-from tennis_scoreboard.views.views import BaseView, NewMatchView
 from tennis_scoreboard.controllers.structures import HttpRequest, HttpResponse
+from tennis_scoreboard.views.views import BaseView, NewMatchView
 
 
 class StaticHtmlController:

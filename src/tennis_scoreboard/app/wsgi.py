@@ -1,12 +1,13 @@
+from collections.abc import Callable
 from http import HTTPStatus
-from typing import Any, Callable
+from typing import Any
 from urllib.parse import parse_qs
 from wsgiref.types import InputStream
 
 from tennis_scoreboard.app.router import Router
+from tennis_scoreboard.controllers.structures import HttpRequest, HttpResponse
 from tennis_scoreboard.views.renderer import Renderer
 from tennis_scoreboard.views.views import NotFoundView
-from tennis_scoreboard.controllers.structures import HttpRequest, HttpResponse
 
 
 class WsgiApp:

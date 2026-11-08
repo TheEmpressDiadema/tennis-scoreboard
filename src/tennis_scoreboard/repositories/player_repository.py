@@ -1,8 +1,8 @@
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 
-from tennis_scoreboard.models.models import Player
 from tennis_scoreboard.errors.db_errors import PlayerExistsError, PlayerNotFoundError
+from tennis_scoreboard.models.models import Player
 from tennis_scoreboard.repositories.abstract import BaseRepository, PlayerRepository
 
 

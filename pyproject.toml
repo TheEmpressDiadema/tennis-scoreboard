@@ -12,6 +12,7 @@ dependencies = [
     "jinja2>=3.1.6",
     "pymysql>=1.2.3",
     "pytest>=9.1.1",
+    "ruff>=0.17.4",
     "sqlalchemy>=2.0.52",
     "types-waitress>=3.0.1.20260724",
     "waitress>=3.0.2",

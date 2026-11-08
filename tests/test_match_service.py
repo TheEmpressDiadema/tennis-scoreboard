@@ -1,8 +1,8 @@
 import pytest
 
-from tennis_scoreboard.schemas.score import Score, PlayerScore
-from tennis_scoreboard.services.match_service import MatchService
 from tennis_scoreboard.errors.db_errors import MatchNotFoundError, PlayerNotFoundError
+from tennis_scoreboard.schemas.score import PlayerScore, Score
+from tennis_scoreboard.services.match_service import MatchService
 
 
 class TestMatchService:
@@ -35,7 +35,7 @@ class TestMatchService:
 
     def test_update_unexisting_match(self, match_service: MatchService) -> None:
         with pytest.raises(MatchNotFoundError):
-            match_schema = match_service.update_match(
+            match_service.update_match(
                 '00000000-0000-0000-0000-0000-00000001',
                 Score(PlayerScore('15', 0, 0), PlayerScore('0', 0, 0))
             )
@@ -46,7 +46,7 @@ class TestMatchService:
 
     def test_get_unexisting_match_by_uuid(self, match_service: MatchService) -> None:
         with pytest.raises(MatchNotFoundError):
-            match_schema = match_service.get_match_by_uuid('00000000-0000-0000-0000-0000-00000001')
+            match_service.get_match_by_uuid('00000000-0000-0000-0000-0000-00000001')
 
     def test_get_matches(self, match_service: MatchService, fill_matches) -> None:
         match_schemas, page_count = match_service.get_ended_matches_with_page_count()
@@ -70,4 +70,4 @@ class TestMatchService:
 
     def test_get_ended_unknown_player_matches(self, match_service: MatchService) -> None:
         with pytest.raises(PlayerNotFoundError):
-            match_schemas, page_count = match_service.get_ended_matches_with_page_count(player_name='Egor')
+            _match_schemas, _page_count = match_service.get_ended_matches_with_page_count(player_name='Egor')

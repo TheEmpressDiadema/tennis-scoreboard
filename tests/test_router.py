@@ -1,8 +1,10 @@
+from http import HTTPStatus
+
 import pytest
 
-from http import HTTPStatus
 from tennis_scoreboard.app.router import Router
 from tennis_scoreboard.controllers.structures import HttpRequest
+
 
 class TestRouter:
 
@@ -20,4 +22,4 @@ class TestRouter:
 
     def test_route_not_found(self, router: Router) -> None:
         with pytest.raises(LookupError):
-            handler = router.get_handler('GET', 'masdasd')
+            router.get_handler('GET', 'masdasd')

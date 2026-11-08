@@ -1,11 +1,11 @@
-from uuid import uuid4, UUID
+from uuid import UUID, uuid4
 
-from sqlalchemy import select, or_
+from sqlalchemy import or_, select
 
-from tennis_scoreboard.models.models import Match, Player
-from tennis_scoreboard.schemas.score import Score
-from tennis_scoreboard.repositories.abstract import BaseRepository, MatchRepository
 from tennis_scoreboard.errors.db_errors import MatchNotFoundError
+from tennis_scoreboard.models.models import Match, Player
+from tennis_scoreboard.repositories.abstract import BaseRepository, MatchRepository
+from tennis_scoreboard.schemas.score import Score
 
 
 class MatchSqlRepository(BaseRepository, MatchRepository):

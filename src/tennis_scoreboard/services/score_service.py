@@ -1,8 +1,8 @@
 from dataclasses import asdict
 from typing import Any
 
-from tennis_scoreboard.schemas.score import Score, PlayerScore
 from tennis_scoreboard.errors.score_errors import MatchEnded
+from tennis_scoreboard.schemas.score import PlayerScore, Score
 
 
 class ScoreService:

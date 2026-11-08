@@ -1,11 +1,11 @@
-from uuid import UUID
-from typing import Protocol
 from abc import ABC
+from typing import Protocol
+from uuid import UUID
 
 from sqlalchemy.orm import Session
 
+from tennis_scoreboard.models.models import Match, Player
 from tennis_scoreboard.schemas.score import Score
-from tennis_scoreboard.models.models import Player, Match
 
 
 class BaseRepository(ABC):

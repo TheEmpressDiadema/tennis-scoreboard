@@ -1,9 +1,9 @@
-import pytest
 
 from http import HTTPStatus
 
-from tennis_scoreboard.controllers.structures import HttpRequest
 from tennis_scoreboard.controllers.static_html_controller import StaticHtmlController
+from tennis_scoreboard.controllers.structures import HttpRequest
+
 
 class TestStaticHtmlController:
 

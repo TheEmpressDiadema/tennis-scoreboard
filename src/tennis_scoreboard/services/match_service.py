@@ -1,12 +1,11 @@
 import math
-
 from uuid import UUID
 
-from tennis_scoreboard.schemas.score import Score
-from tennis_scoreboard.models.models import Match
-from tennis_scoreboard.schemas.match_schema import MatchSchema
 from tennis_scoreboard.errors.db_errors import PlayerNotFoundError
+from tennis_scoreboard.models.models import Match
 from tennis_scoreboard.repositories.unit_of_work import UnitOfWork
+from tennis_scoreboard.schemas.match_schema import MatchSchema
+from tennis_scoreboard.schemas.score import Score
 
 
 class MatchService:

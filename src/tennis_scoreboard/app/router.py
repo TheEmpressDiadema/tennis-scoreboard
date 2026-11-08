@@ -1,4 +1,4 @@
-from typing import Callable
+from collections.abc import Callable
 from dataclasses import dataclass
 
 from tennis_scoreboard.controllers.structures import HttpRequest, HttpResponse

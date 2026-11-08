@@ -1,13 +1,13 @@
-import pytest
-
 from uuid import UUID
+
+import pytest
 from sqlalchemy.orm import Session
 
-from tennis_scoreboard.models.models import Match, Player
-from tennis_scoreboard.schemas.score import Score, PlayerScore
 from tennis_scoreboard.errors.db_errors import MatchNotFoundError
 from tennis_scoreboard.errors.validation_errors import SamePlayersInputError
+from tennis_scoreboard.models.models import Player
 from tennis_scoreboard.repositories.match_repository import MatchSqlRepository
+from tennis_scoreboard.schemas.score import PlayerScore, Score
 
 
 class TestMatchRepository:
@@ -20,7 +20,7 @@ class TestMatchRepository:
     def test_same_id_players_match(self, db_session: Session, fill_players) -> None:
         with pytest.raises(SamePlayersInputError):
             repo = MatchSqlRepository(db_session)
-            match_object = repo.add(Player(id=1, name='Victor'), Player(id=1, name='Victor'))
+            repo.add(Player(id=1, name='Victor'), Player(id=1, name='Victor'))
 
     def test_update_match(self, db_session: Session, fill_matches) -> None:
         repo = MatchSqlRepository(db_session)
@@ -35,7 +35,7 @@ class TestMatchRepository:
         repo = MatchSqlRepository(db_session)
         score = Score(PlayerScore('15', 0, 0), PlayerScore('0', 0, 0))
         with pytest.raises(MatchNotFoundError):
-            match_object = repo.update(
+            repo.update(
                 UUID('00000000-0000-0000-0000-0000-00000004'), 
                 score
             )
@@ -63,4 +63,4 @@ class TestMatchRepository:
     def test_get_unexisting_match_by_uuid(self, db_session: Session) -> None:
         repo = MatchSqlRepository(db_session)
         with pytest.raises(MatchNotFoundError):
-            match_object = repo.get_by_uuid(UUID('00000000-0000-0000-0000-0000-00000001'))
+            repo.get_by_uuid(UUID('00000000-0000-0000-0000-0000-00000001'))

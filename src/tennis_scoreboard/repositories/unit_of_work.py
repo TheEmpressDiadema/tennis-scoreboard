@@ -1,12 +1,12 @@
-from typing import Self
 from collections.abc import Iterator
 from contextlib import contextmanager
+from typing import Self
 
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import Session, sessionmaker
 
-from tennis_scoreboard.repositories.abstract import PlayerRepository, MatchRepository
-from tennis_scoreboard.repositories.player_repository import PlayerSqlRepository
+from tennis_scoreboard.repositories.abstract import MatchRepository, PlayerRepository
 from tennis_scoreboard.repositories.match_repository import MatchSqlRepository
+from tennis_scoreboard.repositories.player_repository import PlayerSqlRepository
 
 
 class UnitOfWork:

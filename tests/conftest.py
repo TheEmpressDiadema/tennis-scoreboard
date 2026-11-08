@@ -1,17 +1,18 @@
-import pytest
-
 from uuid import UUID
+
+import pytest
+from sqlalchemy import Connection, Engine, create_engine
 from sqlalchemy.orm import Session, sessionmaker
-from sqlalchemy import Connection, create_engine, Engine
 
 from tennis_scoreboard.app.router import Router
+from tennis_scoreboard.controllers.match_controller import MatchController
 from tennis_scoreboard.core.db_config import DBConfig
-from tennis_scoreboard.schemas.score import Score, PlayerScore
+from tennis_scoreboard.models.models import BaseModel, Match, Player
+from tennis_scoreboard.repositories.unit_of_work import UnitOfWork
+from tennis_scoreboard.schemas.score import PlayerScore, Score
 from tennis_scoreboard.services.match_service import MatchService
 from tennis_scoreboard.services.score_service import ScoreService
-from tennis_scoreboard.repositories.unit_of_work import UnitOfWork
-from tennis_scoreboard.models.models import BaseModel, Player, Match
-from tennis_scoreboard.controllers.match_controller import MatchController
+
 
 @pytest.fixture(scope='session')
 def engine():

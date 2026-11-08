@@ -1,6 +1,6 @@
+from dataclasses import dataclass, field
 from http import HTTPStatus
 from typing import Any, Self
-from dataclasses import dataclass, field
 
 from tennis_scoreboard.views.views import BaseView
 

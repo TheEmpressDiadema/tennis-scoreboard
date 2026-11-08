@@ -1,6 +1,6 @@
 import tomllib
-
 from typing import Any
+
 from sqlalchemy import URL
 
 

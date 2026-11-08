@@ -1,7 +1,7 @@
 import pytest
 
 from tennis_scoreboard.errors.score_errors import MatchEnded
-from tennis_scoreboard.schemas.score import Score, PlayerScore
+from tennis_scoreboard.schemas.score import PlayerScore, Score
 from tennis_scoreboard.services.score_service import ScoreService
 
 
@@ -135,7 +135,7 @@ class TestScoreService:
     )
     def test_update_ended_match(self, score: Score, score_to_change: str) -> None:
         with pytest.raises(MatchEnded):
-            result = self._score_service.award_point(
+            self._score_service.award_point(
                 score,
                 score_to_change
             )

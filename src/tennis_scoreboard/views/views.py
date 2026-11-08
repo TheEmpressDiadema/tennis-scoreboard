@@ -1,5 +1,5 @@
+from dataclasses import dataclass, field
 from typing import Any
-from dataclasses import dataclass, asdict, field
 
 from tennis_scoreboard.schemas.match_schema import MatchSchema
 

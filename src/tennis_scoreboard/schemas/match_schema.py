@@ -1,5 +1,5 @@
-from typing import Self
 from dataclasses import dataclass, field
+from typing import Self
 
 from tennis_scoreboard.models.models import Match
 from tennis_scoreboard.schemas.player_schema import PlayerSchema

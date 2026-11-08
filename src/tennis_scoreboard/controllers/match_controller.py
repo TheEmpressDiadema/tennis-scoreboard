@@ -1,17 +1,16 @@
 from http import HTTPStatus
 
+from tennis_scoreboard.controllers.structures import HttpRequest, HttpResponse
+from tennis_scoreboard.errors.db_errors import MatchNotFoundError, PlayerNotFoundError
 from tennis_scoreboard.errors.score_errors import MatchEnded
+from tennis_scoreboard.errors.validation_errors import ValidationError
 from tennis_scoreboard.services.match_service import MatchService
 from tennis_scoreboard.services.score_service import ScoreService
-from tennis_scoreboard.errors.validation_errors import ValidationError
-from tennis_scoreboard.errors.db_errors import MatchNotFoundError, PlayerNotFoundError
-from tennis_scoreboard.controllers.structures import HttpRequest, HttpResponse
-
 from tennis_scoreboard.views.views import (
-    MatchScoreView,
     MatchListView,
+    MatchScoreView,
+    NewMatchView,
     NotFoundView,
-    NewMatchView
 )
 
 
