@@ -1,3 +1,5 @@
+import logging
+
 from collections.abc import Callable
 from http import HTTPStatus
 from typing import Any
@@ -9,10 +11,10 @@ from tennis_scoreboard.controllers.structures import HttpRequest, HttpResponse
 from tennis_scoreboard.views.renderer import Renderer
 from tennis_scoreboard.views.views import NotFoundView
 
+logger = logging.getLogger('waitress')
+
 
 class WsgiApp:
-
-    _STATIC_PREFIX = '/static/'
 
     def __init__(self, router: Router, renderer: Renderer):
         self._router = router
@@ -23,6 +25,8 @@ class WsgiApp:
             body = self._renderer.render_css(path)
         except (FileNotFoundError, IsADirectoryError):
             return HttpResponse(status=HTTPStatus.NOT_FOUND, view=NotFoundView())
+        except:
+            return HttpResponse(status=HTTPStatus.INTERNAL_SERVER_ERROR)
 
         return HttpResponse(
             status=HTTPStatus.OK,
@@ -64,18 +68,23 @@ class WsgiApp:
         )
 
     def _get_response(self, request: HttpRequest) -> HttpResponse:
-        if request.path.startswith(self._STATIC_PREFIX):
+        if request.path.startswith('/static/'):
             return self._serve_static(request.path)
 
         try:
             handler = self._router.get_handler(request.method, request.path)
         except LookupError:
             return HttpResponse(status=HTTPStatus.NOT_FOUND, view=NotFoundView())
+        except:
+            return HttpResponse(status=HTTPStatus.INTERNAL_SERVER_ERROR)
 
         return handler(request)
 
     def __call__(self, environ: dict[str, Any], start_response: Callable) -> list[bytes]:
         request = self._parse_request(environ)
+        logger.info(
+            f'REQUEST: METHOD: {request.method}; PATH: {request.path}; BODY: {request.body}, PARAMS: {request.params}'
+        )
         response = self._get_response(request)
 
         body = (
@@ -83,6 +92,11 @@ class WsgiApp:
             if response.view is not None
             else response.body
         )
+
+        if response.status == HTTPStatus.INTERNAL_SERVER_ERROR:
+            logger.exception('UNHANDLED EXCEPTION')
+        else:
+            logger.info(f'RESPONSE: STATUS: {response.status}, HEADERS: {response.headers}')
 
         start_response(
             f'{response.status.value} {response.status.phrase}',
