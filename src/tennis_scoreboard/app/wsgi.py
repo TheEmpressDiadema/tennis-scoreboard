@@ -2,6 +2,7 @@ import logging
 
 from collections.abc import Callable
 from http import HTTPStatus
+from logging.handlers import RotatingFileHandler
 from typing import Any
 from urllib.parse import parse_qs
 from wsgiref.types import InputStream
@@ -11,7 +12,15 @@ from tennis_scoreboard.controllers.structures import HttpRequest, HttpResponse
 from tennis_scoreboard.views.renderer import Renderer
 from tennis_scoreboard.views.views import NotFoundView
 
-logger = logging.getLogger('waitress')
+file_handler = RotatingFileHandler(
+        'application.log',
+        maxBytes=5*1024*1024,
+        encoding='utf-8'
+    )
+console_handler = logging.StreamHandler()
+logger = logging.getLogger(__name__)
+logger.addHandler(file_handler)
+logger.addHandler(console_handler)
 
 
 class WsgiApp:
