@@ -1,5 +1,4 @@
 # Tennis scoreboard python backend project
-<b>Implementation of the study project of the community backend roadmap aimed at building of knowlege of:</b>  
 
 ## Technologies:
 Back-end: `python Waitress`  
