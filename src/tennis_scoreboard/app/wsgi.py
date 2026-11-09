@@ -12,22 +12,24 @@ from tennis_scoreboard.controllers.structures import HttpRequest, HttpResponse
 from tennis_scoreboard.views.renderer import Renderer
 from tennis_scoreboard.views.views import NotFoundView
 
-file_handler = RotatingFileHandler(
-        'application.log',
-        maxBytes=5*1024*1024,
-        encoding='utf-8'
-    )
-console_handler = logging.StreamHandler()
-logger = logging.getLogger(__name__)
-logger.addHandler(file_handler)
-logger.addHandler(console_handler)
-
 
 class WsgiApp:
 
     def __init__(self, router: Router, renderer: Renderer):
         self._router = router
         self._renderer = renderer
+        self._setup_logging()
+
+    def _setup_logging(self) -> None:
+        file_handler = RotatingFileHandler(
+            'application.log',
+            maxBytes=5*1024*1024,
+            encoding='utf-8'
+        )
+        console_handler = logging.StreamHandler()
+        self._logger = logging.getLogger(__name__)
+        self._logger.addHandler(file_handler)
+        self._logger.addHandler(console_handler)
 
     def _serve_static(self, path: str) -> HttpResponse:
         try:
@@ -91,8 +93,8 @@ class WsgiApp:
 
     def __call__(self, environ: dict[str, Any], start_response: Callable) -> list[bytes]:
         request = self._parse_request(environ)
-        logger.info(
-            f'REQUEST: METHOD: {request.method}; PATH: {request.path}; BODY: {request.body}, PARAMS: {request.params}'
+        self._logger.info(
+            f'REQUEST: METHOD: "{request.method}"; PATH: "{request.path}"; BODY: {request.body}, PARAMS: {request.params}'
         )
         response = self._get_response(request)
 
@@ -103,9 +105,9 @@ class WsgiApp:
         )
 
         if response.status == HTTPStatus.INTERNAL_SERVER_ERROR:
-            logger.exception('UNHANDLED EXCEPTION')
+            self._logger.exception('UNHANDLED EXCEPTION')
         else:
-            logger.info(f'RESPONSE: STATUS: {response.status}, HEADERS: {response.headers}')
+            self._logger.info(f'RESPONSE: STATUS: "{response.status}", HEADERS: {response.headers}')
 
         start_response(
             f'{response.status.value} {response.status.phrase}',
