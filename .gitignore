@@ -15,11 +15,8 @@ wheels/
 .pytest_cache
 
 #some files
-tz.txt
 server_security.toml
-score_template.json
 /migrations/versions
-sql_template.txt
 *.log
 .python-version
 **/db_config.toml
