@@ -35,7 +35,7 @@ bash create_configs.sh
 
 Scripts are not rewriting existing files, so relaunch won't clear settings.  
 
-### Шаг 3. Fill in the settings of the created files
+### Step 3. Fill in the settings of the created files
 
 For `test_db_config.toml` and `db_config.toml`
 
