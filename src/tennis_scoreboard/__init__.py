@@ -1,4 +1,6 @@
+import logging
 import waitress
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -36,5 +38,9 @@ def build_app():
     return app
 
 def main() -> None:
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s %(levelname)s %(name)s: %(message)s'
+    )
     app = build_app()
     waitress.serve(app, host='127.0.0.1', port=8080, threads=1)
