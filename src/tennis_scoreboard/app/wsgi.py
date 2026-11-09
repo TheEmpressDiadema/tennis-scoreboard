@@ -1,5 +1,4 @@
 import logging
-
 from collections.abc import Callable
 from http import HTTPStatus
 from logging.handlers import RotatingFileHandler

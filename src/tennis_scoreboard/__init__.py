@@ -1,6 +1,6 @@
 import logging
-import waitress
 
+import waitress
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
