@@ -23,7 +23,7 @@ uv sync
 ### Step 2. Generate config files
 
 Create necessary `.toml` files in the project root directory:
-`db_config.toml`, `test_db_config.toml` и `server_security.toml`.  
+`db_config.toml`, `test_db_config.toml` and `server_security.toml`.  
 
 **Linux / macOS** — execute `create_configs.sh` in the project root directory:
 
