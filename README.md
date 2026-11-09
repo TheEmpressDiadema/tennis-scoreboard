@@ -25,13 +25,13 @@ uv sync
 Create necessary `.toml` files in the project root directory:
 `db_config.toml`, `test_db_config.toml` and `server_security.toml`.  
 
-**Linux / macOS** — execute `create_configs.sh` in the project root directory:
+**Linux / macOS** — execute `create_configs.sh` from the project root directory:
 
 ```bash
 bash create_configs.sh
 ```
 
-**Windows** — execute `create_configs.bat` in the project root directory
+**Windows** — execute `create_configs.bat` from the project root directory
 
 Scripts are not rewriting existing files, so relaunch won't clear settings.  
 
