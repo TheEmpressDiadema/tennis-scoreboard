@@ -20,7 +20,20 @@ pip install uv
 uv sync
 ```
 
-### Step 2. Generate config files
+### Step 2. Create your database schemas:
+
+This project requires 2 databases to exist: test database and main database for application  
+After creating database run
+
+```alembic revision --autogenerate```
+
+to create migration file and
+
+```alembic upgrade head```
+
+to create database tables
+
+### Step 3. Generate config files
 
 Create necessary `.toml` files in the project root directory:
 `db_config.toml`, `test_db_config.toml` and `server_security.toml`.  
@@ -35,7 +48,7 @@ bash create_configs.sh
 
 Scripts are not rewriting existing files, so relaunch won't clear settings.  
 
-### Step 3. Fill in the settings of the created files
+### Step 4. Fill in the settings of the created files
 
 For `test_db_config.toml` and `db_config.toml`
 
@@ -57,6 +70,6 @@ password = 'db password'
 
 Replace plugs with real MySql server settings to use.
 
-### Step 4. Run!
+### Step 5. Run!
 
 ```uv run tennis-scoreboard```
