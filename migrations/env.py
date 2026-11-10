@@ -1,4 +1,5 @@
 from logging.config import fileConfig
+from typing import Any
 
 from alembic import context
 from sqlalchemy import engine_from_config, pool
@@ -8,7 +9,14 @@ from tennis_scoreboard.models.models import (
     BaseModel,
     Match,  #noqa
     Player,  #noqa
+    ScoreType,
 )
+
+
+def render_item(obj_type: str, obj: Any, autogen_context: Any) -> Any:
+    if obj_type == 'type' and isinstance(obj, ScoreType):
+        return "sa.JSON()"
+    return False
 
 config = context.config
 
@@ -29,6 +37,7 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        render_item=render_item
     )
 
     with context.begin_transaction():
@@ -44,7 +53,9 @@ def run_migrations_online() -> None:
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata
+            connection=connection, 
+            target_metadata=target_metadata,
+            render_item=render_item
         )
 
         with context.begin_transaction():
